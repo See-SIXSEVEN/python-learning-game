@@ -354,3 +354,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.teacherDashboard = new TeacherDashboard();
     window.teacherDashboard.init();
 });
+
