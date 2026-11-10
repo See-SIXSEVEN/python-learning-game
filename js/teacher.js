@@ -233,8 +233,8 @@ class TeacherDashboard {
                     </span>
                 </td>
                 <td style="text-align: center;">
-                    <span style="color: ${completedCount === 10 ? 'var(--text-green)' : 'var(--text-muted)'}; font-weight: 600;">
-                        ${completedCount} / 10 ข้อ
+                    <span style="color: ${completedCount === 5 ? 'var(--text-green)' : 'var(--text-muted)'}; font-weight: 600;">
+                        ${completedCount} / 5 ข้อ
                     </span>
                 </td>
                 <td><span style="color: var(--text-yellow); font-family: var(--font-pixel); font-size: 0.72rem;">${student.badge || '-'}</span></td>
@@ -299,7 +299,7 @@ class TeacherDashboard {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <strong style="color: var(--text-cyan); font-size: 0.9rem;">ภารกิจที่ ${q.id}: ${q.title} (${q.category})</strong>
                     <span style="font-size: 0.8rem; font-weight: bold; color: ${isPassed ? 'var(--text-green)' : 'var(--text-muted)'};">
-                        ${isPassed ? '✅ ผ่าน (10 XP)' : '⬜ ยังไม่ผ่าน (0 XP)'}
+                        ${isPassed ? '✅ ผ่าน (20 XP)' : '⬜ ยังไม่ผ่าน (0 XP)'}
                     </span>
                 </div>
                 <pre style="background: #050811; color: #a5f3fc; padding: 10px; border-radius: 4px; font-family: var(--font-code); font-size: 0.85rem; overflow-x: auto; white-space: pre-wrap;">${this.escapeHtml(studentCode)}</pre>

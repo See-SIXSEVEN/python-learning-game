@@ -1,4 +1,4 @@
-// Code Execution & Quest Verification Engine using Skulpt
+// Code Execution & Quest Verification Engine using Skulpt (5 Quests Edition)
 
 class QuestValidator {
     constructor() {
@@ -42,7 +42,6 @@ class QuestValidator {
             };
         } catch (err) {
             let errorMsg = err.toString();
-            // Translate common Python errors into friendly Thai guidance for M.3 students
             let friendlyTip = "";
             if (errorMsg.includes("SyntaxError")) {
                 if (code.includes("Print(")) {
@@ -100,114 +99,63 @@ class QuestValidator {
                 break;
             }
 
-            case 2: { // # นินจาไพทอน + print("พร้อมลุย!")
-                const hasComment = codeLines.some(line => /#.*นินจาไพทอน/.test(line));
-                const hasPrint = /print\s*\(\s*["']พร้อมลุย!["']\s*\)/.test(code);
-                const outputMatches = cleanOutput === "พร้อมลุย!";
+            case 2: { // hero = "สายฟ้า"; level = 15; print("ฮีโร่:", hero, "เลเวล:", level)
+                const hasVars = /hero\s*=\s*["']สายฟ้า["']/.test(code) && /level\s*=\s*15\b/.test(code);
+                const hasCommaInPrint = /print\s*\([^)]*,[^)]*\)/.test(code);
+                const outputMatches = cleanOutput === "ฮีโร่: สายฟ้า เลเวล: 15";
 
-                checklistResults.push({ id: "c1", passed: hasComment, message: hasComment ? "มีคอมเมนต์ # นินจาไพทอน" : "ต้องมีบรรทัดคอมเมนต์ขึ้นต้นด้วย # นินจาไพทอน" });
-                checklistResults.push({ id: "c2", passed: hasPrint, message: hasPrint ? "ใช้คำสั่ง print() แสดง 'พร้อมลุย!'" : "ใช้ print(\"พร้อมลุย!\")" });
-                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "ผลลัพธ์แสดงเฉพาะ 'พร้อมลุย!' สำเร็จ" : "ผลลัพธ์ต้องเป็น 'พร้อมลุย!'" });
-                allPassed = hasComment && hasPrint && outputMatches && runResult.success;
+                checklistResults.push({ id: "c1", passed: hasVars, message: hasVars ? "สร้างตัวแปร hero = \"สายฟ้า\" และ level = 15 ถูกต้อง" : "สร้าง hero = \"สายฟ้า\" และ level = 15" });
+                checklistResults.push({ id: "c2", passed: hasCommaInPrint, message: hasCommaInPrint ? "ใช้เครื่องหมายจุลภาค (,) คั่นข้อมูลใน print()" : "ใช้จุลภาค (,) คั่นระหว่างข้อความกับตัวแปร" });
+                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "ผลลัพธ์แสดง 'ฮีโร่: สายฟ้า เลเวล: 15' ถูกต้อง" : "ผลลัพธ์ต้องเป็น 'ฮีโร่: สายฟ้า เลเวล: 15'" });
+                allPassed = hasVars && hasCommaInPrint && outputMatches && runResult.success;
                 break;
             }
 
-            case 3: { // print(10 + 20) and print(5 * 4)
-                const usesMathOps = code.includes('+') && code.includes('*');
-                const noHardcodedStrings = !/print\s*\(\s*["']30["']\s*\)/.test(code) && !/print\s*\(\s*["']20["']\s*\)/.test(code);
-                const firstIs30 = lines.length >= 1 && lines[0] === "30";
-                const secondIs20 = lines.length >= 2 && lines[1] === "20";
-                const outputMatches = firstIs30 && secondIs20;
+            case 3: { // price = 250; qty = 4; discount = 100; total = (price * qty) - discount; print(total) -> 900
+                const hasVars = /price\s*=\s*250/.test(code) && /qty\s*=\s*4/.test(code) && /discount\s*=\s*100/.test(code);
+                const hasFormula = /total\s*=\s*\(?\s*price\s*\*\s*qty\s*\)?\s*-\s*discount/.test(code);
+                const outputIs900 = cleanOutput === "900";
 
-                checklistResults.push({ id: "c1", passed: usesMathOps && lines.length >= 2, message: usesMathOps ? "ใช้ตัวดำเนินการ + และ * ในการคำนวณ" : "อย่าลืมใช้เครื่องหมาย + และ *" });
-                checklistResults.push({ id: "c2", passed: noHardcodedStrings, message: noHardcodedStrings ? "ไม่ได้ใส่เครื่องหมายคำพูดครอบสูตรเลข" : "ห้ามใส่เครื่องหมายคำพูดครอบตัวเลข เพื่อให้ไพทอนคำนวณจริง" });
-                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "ผลลัพธ์แสดง 30 และ 20 ครบ 2 บรรทัด" : "ผลลัพธ์ต้องเป็น 30 ในบรรทัดแรก และ 20 ในบรรทัดที่สอง" });
-                allPassed = usesMathOps && noHardcodedStrings && outputMatches && runResult.success;
+                checklistResults.push({ id: "c1", passed: hasVars, message: hasVars ? "กำหนดตัวแปร price = 250, qty = 4, discount = 100 ครบถ้วน" : "กำหนด price = 250, qty = 4, discount = 100" });
+                checklistResults.push({ id: "c2", passed: hasFormula, message: hasFormula ? "คำนวณ total = (price * qty) - discount ถูกต้อง" : "คำนวณ total = (price * qty) - discount" });
+                checklistResults.push({ id: "c3", passed: outputIs900, message: outputIs900 ? "ผลลัพธ์คือ 900 ถูกต้อง" : "ผลลัพธ์ต้องได้ 900" });
+                allPassed = hasVars && hasFormula && outputIs900 && runResult.success;
                 break;
             }
 
-            case 4: { // print("คะแนนสอบของฉันคือ", 95, "คะแนน")
-                const hasComma = /print\s*\([^)]*,[^)]*\)/.test(code);
-                const has95 = /95/.test(code);
-                const outputMatches = cleanOutput === "คะแนนสอบของฉันคือ 95 คะแนน";
+            case 4: { // Fix Semantic Error: avg = (score1 + score2) / 2 -> 70.0
+                const hasParentheses = /avg\s*=\s*\(\s*score1\s*\+\s*score2\s*\)\s*\/\s*2/.test(code);
+                const contains70 = cleanOutput.includes("70.0") || cleanOutput.includes("70");
+                const outputMatches = cleanOutput === "คะแนนเฉลี่ยคือ: 70.0";
 
-                checklistResults.push({ id: "c1", passed: hasComma, message: hasComma ? "มีเครื่องหมายจุลภาค (,) คั่นข้อมูลใน print()" : "ใช้เครื่องหมายจุลภาค (,) คั่นระหว่างข้อความกับตัวเลข" });
-                checklistResults.push({ id: "c2", passed: has95, message: has95 ? "มีค่า 95 และข้อความครบถ้วน" : "ระบุค่า 95 และข้อความให้ครบ" });
-                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "ผลลัพธ์แสดง 'คะแนนสอบของฉันคือ 95 คะแนน'" : "ผลลัพธ์ต้องเป็น 'คะแนนสอบของฉันคือ 95 คะแนน'" });
-                allPassed = hasComma && has95 && outputMatches && runResult.success;
+                checklistResults.push({ id: "c1", passed: hasParentheses, message: hasParentheses ? "ใส่วงเล็บ (score1 + score2) ถูกต้อง" : "ใส่วงเล็บรอบ (score1 + score2) ก่อนหาร 2" });
+                checklistResults.push({ id: "c2", passed: contains70, message: contains70 ? "คำนวณได้ค่าเฉลี่ย 70.0 ถูกต้องตามคณิตศาสตร์" : "ผลลัพธ์ต้องได้ 70.0 ไม่ใช่ 110.0" });
+                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "แสดงผล 'คะแนนเฉลี่ยคือ: 70.0' สมบูรณ์" : "ผลลัพธ์ต้องแสดง 'คะแนนเฉลี่ยคือ: 70.0'" });
+                allPassed = hasParentheses && contains70 && outputMatches && runResult.success;
                 break;
             }
 
-            case 5: { // name = "กอน" ; power = 100 ; print(name, power)
-                const hasNameVar = /name\s*=\s*["']กอน["']/.test(code);
-                const hasPowerVar = /power\s*=\s*100\b/.test(code);
-                const outputMatches = cleanOutput.includes("กอน") && cleanOutput.includes("100");
+            case 5: { // Boss Stage: Nightmare RPG Shop Checkout System
+                // 1. Comment # ระบบคิดเงินกิลด์
+                const hasComment = codeLines.some(l => /#.*ระบบคิดเงินกิลด์/.test(l));
+                const hasVars = /item_price\s*=\s*500/.test(code) && /qty\s*=\s*3/.test(code) && /discount\s*=\s*100/.test(code);
+                const hasSubtotal = /subtotal\s*=\s*\(?\s*item_price\s*\*\s*qty\s*\)?\s*-\s*discount/.test(code);
+                const hasTax = /tax\s*=.*subtotal.*(\*|x)\s*(0\.07|7\s*\/\s*100)/.test(code);
+                const hasTotal = /total\s*=.*subtotal\s*\+\s*tax/.test(code) || /total\s*=.*tax\s*\+\s*subtotal/.test(code);
 
-                checklistResults.push({ id: "c1", passed: hasNameVar, message: hasNameVar ? "สร้างตัวแปร name = \"กอน\" ถูกต้อง" : "สร้างตัวแปร name = \"กอน\"" });
-                checklistResults.push({ id: "c2", passed: hasPowerVar, message: hasPowerVar ? "สร้างตัวแปร power = 100 ถูกต้อง" : "สร้างตัวแปร power = 100" });
-                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "พิมพ์ค่าตัวแปรทั้งสองสำเร็จ" : "ใช้ print(name, power) เพื่อแสดงผล" });
-                allPassed = hasNameVar && hasPowerVar && outputMatches && runResult.success;
-                break;
-            }
+                // Output lines check
+                const line1Matches = lines.length >= 1 && lines[0].includes("ยอดก่อนภาษี:") && lines[0].includes("1400");
+                const line2Matches = lines.length >= 2 && lines[1].includes("ยอดชำระสุทธิ:") && (lines[1].includes("1498.0") || lines[1].includes("1498"));
 
-            case 6: { // num1 = 15; num2 = 5; total = num1 + num2; print(total)
-                const hasNums = /num1\s*=\s*15/.test(code) && /num2\s*=\s*5/.test(code);
-                const hasTotalCalc = /total\s*=\s*num1\s*\+\s*num2/.test(code) || /total\s*=\s*num2\s*\+\s*num1/.test(code);
-                const printsTotal = /print\s*\(\s*total\s*\)/.test(code) || cleanOutput === "20";
-                const outputIs20 = cleanOutput === "20";
+                const c1 = hasComment && hasVars;
+                const c2 = hasSubtotal && hasTax && hasTotal;
+                const c3 = line1Matches && line2Matches && runResult.success;
 
-                checklistResults.push({ id: "c1", passed: hasNums, message: hasNums ? "กำหนดตัวแปร num1 = 15 และ num2 = 5" : "กำหนด num1 = 15 และ num2 = 5" });
-                checklistResults.push({ id: "c2", passed: hasTotalCalc, message: hasTotalCalc ? "คำนวณ total = num1 + num2 ถูกต้อง" : "สร้าง total = num1 + num2" });
-                checklistResults.push({ id: "c3", passed: printsTotal && outputIs20, message: outputIs20 ? "พิมพ์ค่า total ได้ผลลัพธ์เป็น 20" : "ผลลัพธ์ต้องเป็น 20" });
-                allPassed = hasNums && hasTotalCalc && outputIs20 && runResult.success;
-                break;
-            }
+                checklistResults.push({ id: "c1", passed: c1, message: c1 ? "เขียน Comment และกำหนดตัวแปรไอเทมครบถ้วน" : "ใส่คอมเมนต์ # ระบบคิดเงินกิลด์ และกำหนดตัวแปร item_price, qty, discount" });
+                checklistResults.push({ id: "c2", passed: c2, message: c2 ? "คำนวณ subtotal, tax 7% และ total ยอดสุทธิถูกต้อง" : "คำนวณ subtotal, tax = subtotal * 0.07 และ total = subtotal + tax" });
+                checklistResults.push({ id: "c3", passed: c3, message: c3 ? "ผลลัพธ์แสดง 2 บรรทัดถูกต้องสมบูรณ์ (1400 และ 1498.0)" : "ผลลัพธ์ต้องแสดง 'ยอดก่อนภาษี: 1400' และ 'ยอดชำระสุทธิ: 1498.0'" });
 
-            case 7: { // # บัตรตัวละคร; hero = "สายฟ้า"; level = 50; print("ฮีโร่:", hero, "เลเวล:", level)
-                const hasComment = codeLines.some(l => /#.*บัตรตัวละคร/.test(l));
-                const hasVars = /hero\s*=\s*["']สายฟ้า["']/.test(code) && /level\s*=\s*50\b/.test(code);
-                const outputMatches = cleanOutput === "ฮีโร่: สายฟ้า เลเวล: 50";
-
-                checklistResults.push({ id: "c1", passed: hasComment, message: hasComment ? "มีคอมเมนต์ # บัตรตัวละคร" : "ใส่คอมเมนต์ # บัตรตัวละคร" });
-                checklistResults.push({ id: "c2", passed: hasVars, message: hasVars ? "สร้างตัวแปร hero = \"สายฟ้า\" และ level = 50" : "สร้างตัวแปร hero = \"สายฟ้า\" และ level = 50" });
-                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "ผลลัพธ์แสดง 'ฮีโร่: สายฟ้า เลเวล: 50'" : "ผลลัพธ์ต้องเป็น 'ฮีโร่: สายฟ้า เลเวล: 50'" });
-                allPassed = hasComment && hasVars && outputMatches && runResult.success;
-                break;
-            }
-
-            case 8: { // ticket = 160; qty = 3; discount = 50; total = (ticket * qty) - discount; print(total) -> 430
-                const hasVars = /ticket\s*=\s*160/.test(code) && /qty\s*=\s*3/.test(code) && /discount\s*=\s*50/.test(code);
-                const hasFormula = /total\s*=\s*\(?\s*ticket\s*\*\s*qty\s*\)?\s*-\s*discount/.test(code);
-                const outputIs430 = cleanOutput === "430";
-
-                checklistResults.push({ id: "c1", passed: hasVars, message: hasVars ? "กำหนดตัวแปร ticket, qty, discount ครบถ้วน" : "กำหนด ticket = 160, qty = 3, discount = 50" });
-                checklistResults.push({ id: "c2", passed: hasFormula, message: hasFormula ? "คำนวณ total = (ticket * qty) - discount ถูกต้อง" : "คำนวณ total = (ticket * qty) - discount" });
-                checklistResults.push({ id: "c3", passed: outputIs430, message: outputIs430 ? "ผลลัพธ์คือ 430 ถูกต้อง" : "ผลลัพธ์ต้องได้ 430" });
-                allPassed = hasVars && hasFormula && outputIs430 && runResult.success;
-                break;
-            }
-
-            case 9: { // Fix Syntax Error: Print("คะแนนของคุณคือ" score)
-                const noUppercasePrint = !/Print\s*\(/.test(code);
-                const hasCommaInPrint = /print\s*\([^,)]+,\s*score\s*\)/.test(code);
-                const outputMatches = cleanOutput === "คะแนนของคุณคือ 100";
-
-                checklistResults.push({ id: "c1", passed: noUppercasePrint, message: noUppercasePrint ? "แก้ไข Print เป็น print สำเร็จ" : "แก้ Print ให้เป็นตัวพิมพ์เล็ก print" });
-                checklistResults.push({ id: "c2", passed: hasCommaInPrint, message: hasCommaInPrint ? "ใส่เครื่องหมายจุลภาค (,) คั่นตัวแปร score" : "ใส่เครื่องหมายจุลภาค (,) ระหว่างข้อความกับ score" });
-                checklistResults.push({ id: "c3", passed: outputMatches && runResult.success, message: outputMatches ? "รันผ่านและได้ผลลัพธ์ 'คะแนนของคุณคือ 100'" : "ผลลัพธ์ต้องเป็น 'คะแนนของคุณคือ 100'" });
-                allPassed = noUppercasePrint && hasCommaInPrint && outputMatches && runResult.success;
-                break;
-            }
-
-            case 10: { // Fix Semantic Error: avg_price = (price1 + price2) / 2
-                const hasParentheses = /avg_price\s*=\s*\(\s*price1\s*\+\s*price2\s*\)\s*\/\s*2/.test(code);
-                const contains50 = cleanOutput.includes("50.0") || cleanOutput.includes("50");
-                const outputMatches = cleanOutput === "ราคาเฉลี่ยคือ: 50.0";
-
-                checklistResults.push({ id: "c1", passed: hasParentheses, message: hasParentheses ? "ใส่วงเล็บ (price1 + price2) ถูกต้อง" : "ใส่วงเล็บรอบ (price1 + price2) ก่อนหาร 2" });
-                checklistResults.push({ id: "c2", passed: contains50, message: contains50 ? "คำนวณได้ค่าเฉลี่ย 50.0 ถูกต้องตามคณิตศาสตร์" : "ผลลัพธ์การคำนวณต้องได้ 50.0 ไม่ใช่ 90.0" });
-                checklistResults.push({ id: "c3", passed: outputMatches, message: outputMatches ? "แสดงผล 'ราคาเฉลี่ยคือ: 50.0' สมบูรณ์" : "ผลลัพธ์ต้องแสดง 'ราคาเฉลี่ยคือ: 50.0'" });
-                allPassed = hasParentheses && contains50 && outputMatches && runResult.success;
+                allPassed = c1 && c2 && c3 && runResult.success;
                 break;
             }
 
@@ -235,4 +183,3 @@ class QuestValidator {
 }
 
 window.questValidator = new QuestValidator();
-

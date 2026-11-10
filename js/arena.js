@@ -139,7 +139,7 @@ class ArenaController {
         window.storageManager.saveProgress(progress);
 
         // Update Quest Info
-        document.getElementById('quest-card-num').textContent = `ภารกิจที่ ${quest.id} / 10 • ${quest.category}`;
+        document.getElementById('quest-card-num').textContent = `ภารกิจที่ ${quest.id} / 5 • ${quest.category}`;
         const diffBadge = document.getElementById('quest-card-difficulty');
         diffBadge.textContent = quest.difficulty;
         diffBadge.className = `tag-difficulty ${quest.difficultyClass}`;
@@ -193,7 +193,7 @@ class ArenaController {
         const btnNext = document.getElementById('btn-next-quest');
         if (btnPrev) btnPrev.disabled = questId === 1;
         if (btnNext) {
-            btnNext.innerHTML = questId === 10 ? '<span>สรุปผลภารกิจ 🏆</span>' : '<span>ภารกิจถัดไป ▶</span>';
+            btnNext.innerHTML = questId === 5 ? '<span>สรุปผลภารกิจ 🏆</span>' : '<span>ภารกิจถัดไป ▶</span>';
         }
     }
 
@@ -247,7 +247,7 @@ class ArenaController {
                 window.soundFX.playSuccess();
                 this.triggerConfetti();
 
-                const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 10);
+                const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 20);
                 window.storageManager.recordSubmission(window.storageManager.getStudent(), updatedProgress);
                 this.updateXPBar();
                 this.renderQuestRibbon();
@@ -256,7 +256,7 @@ class ArenaController {
                     window.soundFX.playLevelUp();
                     this.showToast("👑 ยินดีด้วย! คุณได้รับฉายา PYTHON GRANDMASTER คะแนนเต็ม 100 XP!");
                 } else {
-                    this.showToast(`🎉 ผ่านภารกิจที่ ${this.currentQuestId} สำเร็จ! ได้รับ +10 XP`);
+                    this.showToast(`🎉 ผ่านภารกิจที่ ${this.currentQuestId} สำเร็จ! ได้รับ +20 XP`);
                 }
 
                 this.showValidationBanner(true, result.feedback, true);
@@ -298,7 +298,7 @@ class ArenaController {
 
         if (showNextBtn) {
             nextBtn.style.display = 'inline-flex';
-            nextBtn.querySelector('span').textContent = this.currentQuestId === 10 ? 'ดูสรุปผลภารกิจ 🏆' : 'ลุยข้อต่อไป ▶';
+            nextBtn.querySelector('span').textContent = this.currentQuestId === 5 ? 'ดูสรุปผลภารกิจ 🏆' : 'ลุยข้อต่อไป ▶';
         } else {
             nextBtn.style.display = 'none';
         }
@@ -326,7 +326,7 @@ class ArenaController {
 
         // Banner Next Button
         document.getElementById('btn-banner-next').addEventListener('click', () => {
-            if (this.currentQuestId < 10) {
+            if (this.currentQuestId < 5) {
                 this.loadQuest(this.currentQuestId + 1);
             } else {
                 window.location.href = 'summary.html';
@@ -340,7 +340,7 @@ class ArenaController {
             }
         });
         document.getElementById('btn-next-quest').addEventListener('click', () => {
-            if (this.currentQuestId < 10) {
+            if (this.currentQuestId < 5) {
                 this.loadQuest(this.currentQuestId + 1);
             } else {
                 window.location.href = 'summary.html';
@@ -441,11 +441,11 @@ class ArenaController {
         document.getElementById('btn-teacher-unlock-all').addEventListener('click', () => {
             const progress = window.storageManager.getProgress();
             window.QUESTS.forEach(q => {
-                window.storageManager.markQuestPassed(q.id, q.solutionCode, 10);
+                window.storageManager.markQuestPassed(q.id, q.solutionCode, 20);
             });
             this.updateXPBar();
             this.renderQuestRibbon();
-            this.showToast("🔓 ปลดล็อก 100 XP ครบทุกข้อแล้ว!");
+            this.showToast("🔓 ปลดล็อก 100 XP ครบทั้ง 5 ข้อแล้ว!");
             modalTeacher.classList.remove('active');
         });
 

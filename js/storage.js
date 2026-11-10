@@ -10,8 +10,39 @@ class StorageManager {
         this.initDefaultLeaderboard();
     }
 
-    // Default class peers for realistic M.3 classroom leaderboard
+    isMockEnabled() {
+        return localStorage.getItem('pyquest_use_mock') === 'true';
+    }
+
+    toggleMockData() {
+        const next = !this.isMockEnabled();
+        localStorage.setItem('pyquest_use_mock', next ? 'true' : 'false');
+        if (!next) {
+            // When disabling mock — clear stale mock entries from leaderboard & submissions
+            this.purgeMockData();
+        }
+        return next;
+    }
+
+    // Remove all mock peer entries from leaderboard and submissions
+    purgeMockData() {
+        // Clear leaderboard (only real students remain via recordSubmission)
+        localStorage.setItem(this.LEADERBOARD_KEY, JSON.stringify([]));
+
+        // Remove peer_* entries from submissions list
+        const raw = localStorage.getItem(this.SUBMISSIONS_KEY);
+        if (raw) {
+            let list = JSON.parse(raw);
+            list = list.filter(item => !String(item.id).startsWith('peer_'));
+            localStorage.setItem(this.SUBMISSIONS_KEY, JSON.stringify(list));
+        }
+    }
+
+    // Default class peers (Only returned if mock mode is explicitly enabled)
     getDefaultPeers() {
+        if (!this.isMockEnabled()) {
+            return [];
+        }
         return [
             { name: "ด.ช. ภัทรดนัย วงศ์วิริยะ", grade: "ม.3/1", no: "5", xp: 100, badge: "👑 Grandmaster", avatar: "⚡", time: "12 นาที" },
             { name: "ด.ญ. พิชญาภา สิทธิโชค", grade: "ม.3/1", no: "18", xp: 100, badge: "👑 Grandmaster", avatar: "🧙", time: "14 นาที" },
@@ -24,8 +55,12 @@ class StorageManager {
     }
 
     initDefaultLeaderboard() {
-        if (!localStorage.getItem(this.LEADERBOARD_KEY)) {
+        // Only pre-populate leaderboard if mock mode is ON
+        if (!localStorage.getItem(this.LEADERBOARD_KEY) && this.isMockEnabled()) {
             localStorage.setItem(this.LEADERBOARD_KEY, JSON.stringify(this.getDefaultPeers()));
+        } else if (!localStorage.getItem(this.LEADERBOARD_KEY)) {
+            // Initialize empty leaderboard (no mock data)
+            localStorage.setItem(this.LEADERBOARD_KEY, JSON.stringify([]));
         }
     }
 
@@ -68,7 +103,7 @@ class StorageManager {
             total += (progress.questScores[qid] || 0);
         }
         progress.totalXP = total;
-        if (progress.completedQuests.length === 10 && !progress.finishTime) {
+        if (progress.completedQuests.length === 5 && !progress.finishTime) {
             progress.finishTime = new Date().toISOString();
         }
         localStorage.setItem(this.PROGRESS_KEY, JSON.stringify(progress));
@@ -166,7 +201,8 @@ class StorageManager {
     getCombinedLeaderboard() {
         const student = this.getStudent();
         const progress = this.getProgress();
-        const peers = JSON.parse(localStorage.getItem(this.LEADERBOARD_KEY)) || this.getDefaultPeers();
+        // Only use stored peers (mock peers only appear if mock mode was ON during initDefaultLeaderboard)
+        const peers = JSON.parse(localStorage.getItem(this.LEADERBOARD_KEY)) || [];
 
         let list = [...peers];
 
@@ -244,8 +280,8 @@ class StorageManager {
             return this.getAllSubmissions();
         }
 
-        // Include default mock peers if list has few items so teacher can see how it works
-        if (list.length <= 1) {
+        // Include default mock peers ONLY if mock mode is enabled and list has very few items
+        if (list.length <= 1 && this.isMockEnabled()) {
             const peers = this.getDefaultPeers();
             peers.forEach((p, idx) => {
                 list.push({
@@ -257,7 +293,7 @@ class StorageManager {
                     xp: p.xp,
                     badge: p.badge,
                     thaiBadge: "คะแนนจากระบบ",
-                    completedQuests: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].slice(0, Math.floor(p.xp / 10)),
+                    completedQuests: [1, 2, 3, 4, 5].slice(0, Math.floor(p.xp / 20)),
                     questScores: {},
                     questCodes: { 1: 'print("Hello, Python!")' },
                     updatedAt: "ส่งแล้ว",
@@ -293,7 +329,7 @@ class StorageManager {
                 no: student.no,
                 xp: progress.totalXP || 0,
                 badge: record ? record.badge : "Python Quest",
-                completedQuests: `${(progress.completedQuests || []).length} / 10 ภารกิจ`,
+                completedQuests: `${(progress.completedQuests || []).length} / 5 ภารกิจ`,
                 timestamp: new Date().toISOString()
             };
 
