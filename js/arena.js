@@ -248,6 +248,7 @@ class ArenaController {
                 this.triggerConfetti();
 
                 const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 10);
+                window.storageManager.recordSubmission(window.storageManager.getStudent(), updatedProgress);
                 this.updateXPBar();
                 this.renderQuestRibbon();
 

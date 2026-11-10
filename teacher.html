@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบแดชบอร์ดครูผู้สอน | Python Quest (ม.3)</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230f172a'/><rect x='4' y='2' width='8' height='3' fill='%23a855f7'/><rect x='3' y='5' width='10' height='7' fill='%2322c55e'/><rect x='5' y='6' width='2' height='2' fill='%23000'/><rect x='9' y='6' width='2' height='2' fill='%23000'/><rect x='7' y='12' width='2' height='3' fill='%23ef4444'/></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- App Retro Pixel Stylesheet -->
+    <link rel="stylesheet" href="css/retro-pixel.css">
+</head>
+<body style="background-color: #060a12;">
+
+    <!-- CRT Scanlines Overlay Effect -->
+    <div class="crt-overlay" id="crt-overlay"></div>
+
+    <!-- TEACHER DASHBOARD CONTAINER -->
+    <div style="max-width: 1200px; margin: 0 auto; padding: 24px 20px; min-height: 100vh;">
+        <!-- Top Header Bar -->
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--border-color); flex-wrap: wrap; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 2rem;">🔑</span>
+                <div>
+                    <h1 class="pixel-text" style="font-size: 1.1rem; color: var(--text-cyan); margin-bottom: 4px;">
+                        TEACHER DASHBOARD
+                    </h1>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">
+                        ระบบติดตามคะแนนและรายงานผลการทดสอบเขียนโค้ด Python ม.3
+                    </p>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="index.html" class="pixel-btn pixel-btn-dark" style="text-decoration: none; font-size: 0.85rem; padding: 8px 14px;">
+                    <span>🏠 หน้าแรกนักเรียน</span>
+                </a>
+                <a href="quest.html" class="pixel-btn pixel-btn-dark" style="text-decoration: none; font-size: 0.85rem; padding: 8px 14px;">
+                    <span>🎮 หน้าทำแบบฝึกหัด</span>
+                </a>
+                <button type="button" class="pixel-btn pixel-btn-primary" id="btn-sync-sheets" style="font-size: 0.85rem; padding: 8px 14px;">
+                    <span>📊 เชื่อม Google Sheets</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- PIN Login Protection Section -->
+        <section id="teacher-login-section" class="pixel-box" style="max-width: 450px; margin: 60px auto; padding: 30px; text-align: center; border-color: var(--border-neon); box-shadow: var(--pixel-shadow-lg), var(--neon-glow-cyan);">
+            <div style="font-size: 3rem; margin-bottom: 12px;">🔒</div>
+            <h2 class="pixel-text" style="font-size: 1rem; color: var(--text-cyan); margin-bottom: 10px;">
+                ยืนยันตัวตนครูผู้สอน
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">
+                กรุณากรอกรหัสผ่านเพื่อเข้าถึงแดชบอร์ดสรุปคะแนนนักเรียน<br>
+                (รหัสเริ่มต้น: <strong style="color: var(--text-yellow);">teacher</strong> หรือ <strong style="color: var(--text-yellow);">1234</strong>)
+            </p>
+            <form id="teacher-pin-form">
+                <input type="password" id="teacher-pin-input" class="form-input" placeholder="กรอกรหัส PIN" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 16px;" autofocus required>
+                <button type="submit" class="pixel-btn pixel-btn-primary" style="width: 100%; padding: 12px;">
+                    <span>🔓 เข้าสู่ระบบแดชบอร์ด</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Main Dashboard Content (Visible after login) -->
+        <section id="teacher-main-dashboard" style="display: none;">
+            <!-- Realtime Statistics Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div class="score-box" style="border-left: 4px solid var(--border-neon);">
+                    <div class="score-box-num" id="stat-total-students" style="color: var(--text-cyan);">0</div>
+                    <div class="score-box-label">👥 นักเรียนที่ทำแบบทดสอบ (คน)</div>
+                </div>
+                <div class="score-box" style="border-left: 4px solid var(--border-green);">
+                    <div class="score-box-num" id="stat-avg-score" style="color: var(--text-green);">0</div>
+                    <div class="score-box-label">📊 คะแนนเฉลี่ย (XP เต็ม 100)</div>
+                </div>
+                <div class="score-box" style="border-left: 4px solid var(--border-yellow);">
+                    <div class="score-box-num" id="stat-grandmasters" style="color: var(--text-yellow);">0</div>
+                    <div class="score-box-label">👑 ได้เต็ม 100 XP (Grandmaster)</div>
+                </div>
+                <div class="score-box" style="border-left: 4px solid var(--border-purple);">
+                    <div class="score-box-num" id="stat-pass-rate" style="color: var(--text-purple);">0%</div>
+                    <div class="score-box-label">🎯 อัตราผ่านเกณฑ์ (&gt;= 50 XP)</div>
+                </div>
+            </div>
+
+            <!-- Filter & Action Controls Bar -->
+            <div class="pixel-box" style="padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1;">
+                    <!-- Filter Class -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="filter-grade" style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">ห้อง:</label>
+                        <select id="filter-grade" class="form-select" style="padding: 8px 12px; width: auto; font-size: 0.88rem;">
+                            <option value="ALL">🏫 ทุกห้องเรียน</option>
+                            <option value="ม.3/1">ม.3/1</option>
+                            <option value="ม.3/2">ม.3/2</option>
+                            <option value="ม.3/3">ม.3/3</option>
+                            <option value="ม.3/4">ม.3/4</option>
+                            <option value="ม.3/5">ม.3/5</option>
+                            <option value="ม.3/6">ม.3/6</option>
+                            <option value="ม.3/7">ม.3/7</option>
+                            <option value="ม.3/8">ม.3/8</option>
+                            <option value="ม.3/9">ม.3/9</option>
+                            <option value="ม.3/10">ม.3/10</option>
+                        </select>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="search-student" class="form-input" placeholder="🔍 ค้นหาชื่อ หรือ เลขที่..." style="padding: 8px 12px; font-size: 0.88rem;">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" class="pixel-btn pixel-btn-success" id="btn-export-excel" style="font-size: 0.85rem; padding: 9px 14px;">
+                        <span>📥 ส่งออกไฟล์ Excel (CSV)</span>
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-dark" id="btn-refresh-data" style="font-size: 0.85rem; padding: 9px 12px;" title="รีเฟรชข้อมูล">
+                        <span>🔄 รีเฟรช</span>
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-dark" id="btn-clear-classroom" style="font-size: 0.85rem; padding: 9px 12px; color: var(--text-red);" title="ล้างคะแนนเพื่อเริ่มสอบห้องใหม่">
+                        <span>🗑️ ล้างคะแนน</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gradebook Table Card -->
+            <div class="leaderboard-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 class="leaderboard-title" style="margin-bottom: 0;">
+                        <span>📋 บัญชีรายชื่อและผลคะแนนการทดสอบ (Gradebook)</span>
+                    </h2>
+                    <span id="table-count-label" style="font-size: 0.85rem; color: var(--text-cyan); font-family: var(--font-pixel);">
+                        แสดง 0 รายการ
+                    </span>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">ที่</th>
+                                <th>ชื่อ - นามสกุล นักเรียน</th>
+                                <th style="width: 80px;">ห้อง</th>
+                                <th style="width: 60px;">เลขที่</th>
+                                <th style="width: 130px; text-align: center;">คะแนนรวม XP</th>
+                                <th style="text-align: center;">ภารกิจที่ผ่าน</th>
+                                <th>ฉายาเกียรติยศ</th>
+                                <th>เวลาที่บันทึก</th>
+                                <th style="text-align: center; width: 100px;">ตรวจโค้ด</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-table-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: INSPECT STUDENT'S PYTHON CODE
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modal-inspect-code">
+        <div class="modal-box" style="max-width: 800px;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="inspect-modal-title">🔍 ตรวจโค้ดของนักเรียน</h3>
+                    <div id="inspect-modal-sub" style="font-size: 0.85rem; color: var(--text-muted);">เด็กชาย...</div>
+                </div>
+                <button type="button" class="modal-close-btn" id="btn-close-inspect">✕</button>
+            </div>
+            <div id="inspect-quests-container" style="max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: GOOGLE SHEETS CLOUD INTEGRATION SETUP
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modal-sheets-setup">
+        <div class="modal-box" style="max-width: 750px;">
+            <div class="modal-header">
+                <h3 class="modal-title">📊 ตั้งค่าส่งคะแนนเข้า Google Sheets แบบ Realtime</h3>
+                <button type="button" class="modal-close-btn" id="btn-close-sheets">✕</button>
+            </div>
+            <div style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.6;">
+                <p style="margin-bottom: 12px;">
+                    เมื่อตั้งค่านี้ ทุกครั้งที่นักเรียนคนใดส่งคำตอบหรือทำแบบฝึกหัดเสร็จ คะแนนจะ <strong>เด้งเข้า Google Sheets ของครูทันทีแบบอัตโนมัติ</strong> โดยไม่ต้องส่งไฟล์! (ฟรี 100%)
+                </p>
+
+                <div style="background: var(--bg-surface); padding: 14px; border-radius: 6px; border-left: 4px solid var(--border-neon); margin-bottom: 16px;">
+                    <strong style="color: var(--text-cyan);">วิธีทำง่ายๆ 3 ขั้นตอน:</strong>
+                    <ol style="margin-left: 20px; margin-top: 6px; font-size: 0.88rem;">
+                        <li>เปิด Google Sheets ใหม่ของคุณ แล้วไปที่เมนู <strong>ส่วนขยาย (Extensions) > Apps Script</strong></li>
+                        <li>วางโค้ด Apps Script ด้านล่างนี้แทนที่ แล้วกด <strong>ทำให้ใช้งานได้ (Deploy) > การทำให้ใช้งานได้รายการใหม่ (New Deployment) > ประเภทเว็บแอป (Web App)</strong> เลือกใครก็ได้ที่มีสิทธิ์เข้าถึง</li>
+                        <li>คัดลอก URL ของ Web App มาวางในช่องด้านล่าง แล้วกดบันทึก!</li>
+                    </ol>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label class="form-label" for="sheets-webhook-url">🔗 Google Apps Script Web App URL:</label>
+                    <input type="url" id="sheets-webhook-url" class="form-input" placeholder="https://script.google.com/macros/s/AKfycbx.../exec">
+                </div>
+
+                <details style="background: #090d16; border: 1px solid #334155; border-radius: 4px; padding: 10px; margin-bottom: 16px;">
+                    <summary style="cursor: pointer; color: var(--text-yellow); font-weight: 600;">คลิกเพื่อดูโค้ด Google Apps Script (คัดลอกไปวางได้เลย)</summary>
+                    <pre style="background: #0f172a; padding: 10px; border-radius: 4px; margin-top: 8px; font-family: var(--font-code); font-size: 0.8rem; overflow-x: auto; color: #7dd3fc;">function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(["วันเวลา", "ชื่อ-นามสกุล", "ชั้น", "เลขที่", "คะแนน XP", "ฉายา", "ภารกิจที่ผ่าน"]);
+  }
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([new Date(), data.name, data.grade, data.no, data.xp, data.badge, data.completedQuests]);
+  return ContentService.createTextOutput("OK").setMimeType(ContentService.MimeType.TEXT);
+}</pre>
+                </details>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="pixel-btn pixel-btn-dark" id="btn-test-sheets">🧪 ทดสอบส่งข้อมูล</button>
+                    <button type="button" class="pixel-btn pixel-btn-primary" id="btn-save-sheets">💾 บันทึกการเชื่อมต่อ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/quests.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/teacher.js"></script>
+</body>
+</html>

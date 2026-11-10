@@ -5,6 +5,8 @@ class StorageManager {
         this.STUDENT_KEY = 'pyquest_student_profile';
         this.PROGRESS_KEY = 'pyquest_student_progress';
         this.LEADERBOARD_KEY = 'pyquest_class_leaderboard';
+        this.SUBMISSIONS_KEY = 'pyquest_all_submissions';
+        this.SHEETS_URL_KEY = 'pyquest_sheets_url';
         this.initDefaultLeaderboard();
     }
 
@@ -192,10 +194,125 @@ class StorageManager {
         return list;
     }
 
+    // Teacher Dashboard: Record student submission
+    recordSubmission(student, progress) {
+        if (!student) return;
+        const raw = localStorage.getItem(this.SUBMISSIONS_KEY);
+        let list = raw ? JSON.parse(raw) : [];
+
+        const studentKey = `${student.name}_${student.grade}_${student.no}`;
+        const rank = this.getRankInfo(progress.totalXP || 0);
+
+        const record = {
+            id: studentKey,
+            name: student.name,
+            grade: student.grade,
+            no: student.no,
+            avatar: student.avatar || '⚡',
+            xp: progress.totalXP || 0,
+            badge: `${rank.badgeIcon} ${rank.title}`,
+            thaiBadge: rank.thaiTitle,
+            completedQuests: progress.completedQuests || [],
+            questScores: progress.questScores || {},
+            questCodes: progress.questCodes || {},
+            updatedAt: new Date().toLocaleString('th-TH'),
+            timestamp: Date.now()
+        };
+
+        const existingIdx = list.findIndex(item => item.id === studentKey);
+        if (existingIdx >= 0) {
+            list[existingIdx] = record;
+        } else {
+            list.push(record);
+        }
+
+        localStorage.setItem(this.SUBMISSIONS_KEY, JSON.stringify(list));
+
+        // Sync with Google Sheets in background if configured
+        this.sendToGoogleSheets(student, progress, record);
+    }
+
+    getAllSubmissions() {
+        const raw = localStorage.getItem(this.SUBMISSIONS_KEY);
+        let list = raw ? JSON.parse(raw) : [];
+
+        // If list is empty, also include current student if registered
+        const currentStudent = this.getStudent();
+        if (currentStudent && !list.some(s => s.name === currentStudent.name && s.grade === currentStudent.grade)) {
+            const prog = this.getProgress();
+            this.recordSubmission(currentStudent, prog);
+            return this.getAllSubmissions();
+        }
+
+        // Include default mock peers if list has few items so teacher can see how it works
+        if (list.length <= 1) {
+            const peers = this.getDefaultPeers();
+            peers.forEach((p, idx) => {
+                list.push({
+                    id: `peer_${idx}`,
+                    name: p.name,
+                    grade: p.grade,
+                    no: p.no,
+                    avatar: p.avatar,
+                    xp: p.xp,
+                    badge: p.badge,
+                    thaiBadge: "คะแนนจากระบบ",
+                    completedQuests: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].slice(0, Math.floor(p.xp / 10)),
+                    questScores: {},
+                    questCodes: { 1: 'print("Hello, Python!")' },
+                    updatedAt: "ส่งแล้ว",
+                    timestamp: Date.now() - (idx * 60000)
+                });
+            });
+        }
+
+        return list;
+    }
+
+    clearAllSubmissions() {
+        localStorage.removeItem(this.SUBMISSIONS_KEY);
+    }
+
+    // Google Sheets Cloud Sync
+    getSheetsUrl() {
+        return localStorage.getItem(this.SHEETS_URL_KEY) || "";
+    }
+
+    setSheetsUrl(url) {
+        localStorage.setItem(this.SHEETS_URL_KEY, url.trim());
+    }
+
+    async sendToGoogleSheets(student, progress, record) {
+        const url = this.getSheetsUrl();
+        if (!url) return;
+
+        try {
+            const payload = {
+                name: student.name,
+                grade: student.grade,
+                no: student.no,
+                xp: progress.totalXP || 0,
+                badge: record ? record.badge : "Python Quest",
+                completedQuests: `${(progress.completedQuests || []).length} / 10 ภารกิจ`,
+                timestamp: new Date().toISOString()
+            };
+
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch (e) {
+            console.warn("Could not sync with Google Sheets:", e);
+        }
+    }
+
     resetAllData() {
         localStorage.removeItem(this.STUDENT_KEY);
         localStorage.removeItem(this.PROGRESS_KEY);
         localStorage.removeItem(this.LEADERBOARD_KEY);
+        localStorage.removeItem(this.SUBMISSIONS_KEY);
         this.initDefaultLeaderboard();
     }
 }
