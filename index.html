@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงทะเบียน | Python Quest: Codédex Edition (ม.3)</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230f172a'/><rect x='4' y='2' width='8' height='3' fill='%23a855f7'/><rect x='3' y='5' width='10' height='7' fill='%2322c55e'/><rect x='5' y='6' width='2' height='2' fill='%23000'/><rect x='9' y='6' width='2' height='2' fill='%23000'/><rect x='7' y='12' width='2' height='3' fill='%23ef4444'/></svg>">
+
+    <!-- Google Fonts for Retro Pixel & Thai Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- App Retro Pixel Stylesheet -->
+    <link rel="stylesheet" href="css/retro-pixel.css">
+</head>
+<body>
+
+    <!-- CRT Scanlines Overlay Effect -->
+    <div class="crt-overlay" id="crt-overlay"></div>
+
+    <!-- PAGE 1: REGISTRATION (หน้าแรกเฉพาะสำหรับลงทะเบียนเข้าสู่ระบบ) -->
+    <main class="page-registration">
+        <div class="reg-card-container">
+            <div class="reg-hero-header">
+                <!-- Retro Pixel Snake Mascot SVG -->
+                <svg class="pixel-snake-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="2" width="12" height="4" fill="#a855f7"/>
+                    <rect x="12" y="6" width="8" height="4" fill="#c084fc"/>
+                    <rect x="14" y="0" width="4" height="2" fill="#facc15"/>
+                    <rect x="8" y="10" width="16" height="12" fill="#22c55e"/>
+                    <rect x="6" y="14" width="20" height="8" fill="#16a34a"/>
+                    <rect x="10" y="12" width="4" height="4" fill="#ffffff"/>
+                    <rect x="12" y="13" width="2" height="3" fill="#000000"/>
+                    <rect x="18" y="12" width="4" height="4" fill="#ffffff"/>
+                    <rect x="20" y="13" width="2" height="3" fill="#000000"/>
+                    <rect x="15" y="22" width="2" height="4" fill="#ef4444"/>
+                    <rect x="13" y="26" width="2" height="2" fill="#ef4444"/>
+                    <rect x="17" y="26" width="2" height="2" fill="#ef4444"/>
+                    <rect x="6" y="22" width="6" height="6" fill="#15803d"/>
+                    <rect x="20" y="22" width="6" height="6" fill="#15803d"/>
+                </svg>
+                <h1 class="pixel-text reg-title">PYTHON QUEST: CODÉDEX</h1>
+                <p class="reg-subtitle">ระบบเรียนรู้และทดสอบการเขียนโปรแกรมภาษา Python ชั้นมัธยมศึกษาปีที่ 3</p>
+            </div>
+
+            <!-- Existing Session Banner (If student already registered) -->
+            <div id="existing-user-box" style="display: none; margin-bottom: 20px; background: rgba(56, 189, 248, 0.12); border: 2px solid var(--border-neon); border-radius: 6px; padding: 16px; text-align: center;">
+                <p style="font-size: 0.95rem; color: #f8fafc; margin-bottom: 8px;">
+                    🎮 พบประวัติการเล่นเดิม: <strong id="existing-name" style="color: var(--text-cyan);">เด็กชาย...</strong>
+                    <span id="existing-sub" style="color: var(--text-muted); font-size: 0.85rem;">(ม.3/1 เลขที่ 1)</span>
+                </p>
+                <p style="font-size: 0.88rem; color: var(--text-yellow); margin-bottom: 14px;">
+                    คะแนนปัจจุบัน: <strong id="existing-xp">0 XP</strong>
+                </p>
+                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" class="pixel-btn pixel-btn-primary" id="btn-continue-quest">
+                        <span>▶ ไปหน้าทำแบบฝึกหัดต่อ</span>
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-dark" id="btn-new-register">
+                        <span>🔄 กรอกข้อมูลคนใหม่</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Registration Form Box -->
+            <div class="reg-form-box" id="reg-form-wrapper">
+                <form id="registration-form">
+                    <div class="form-group">
+                        <label class="form-label" for="reg-fullname">👤 ชื่อ - นามสกุล นักเรียน</label>
+                        <input type="text" id="reg-fullname" class="form-input" placeholder="เช่น เด็กชายกิตติคุณ สดใส" required autocomplete="name">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="reg-grade">🏫 ชั้นมัธยมศึกษา</label>
+                            <select id="reg-grade" class="form-select" required>
+                                <option value="ม.3/1">มัธยมศึกษาปีที่ 3/1</option>
+                                <option value="ม.3/2">มัธยมศึกษาปีที่ 3/2</option>
+                                <option value="ม.3/3">มัธยมศึกษาปีที่ 3/3</option>
+                                <option value="ม.3/4">มัธยมศึกษาปีที่ 3/4</option>
+                                <option value="ม.3/5">มัธยมศึกษาปีที่ 3/5</option>
+                                <option value="ม.3/6">มัธยมศึกษาปีที่ 3/6</option>
+                                <option value="ม.3/7">มัธยมศึกษาปีที่ 3/7</option>
+                                <option value="ม.3/8">มัธยมศึกษาปีที่ 3/8</option>
+                                <option value="ม.3/9">มัธยมศึกษาปีที่ 3/9</option>
+                                <option value="ม.3/10">มัธยมศึกษาปีที่ 3/10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="reg-number">🔢 เลขที่</label>
+                            <input type="number" id="reg-number" class="form-input" min="1" max="60" placeholder="เช่น 12" required>
+                        </div>
+                    </div>
+
+                    <!-- Character Avatar Selection -->
+                    <div class="form-group">
+                        <label class="form-label">👾 เลือกอวาตาร์ประจำตัว</label>
+                        <div class="avatar-selector">
+                            <div class="avatar-option selected" data-avatar="⚡" title="Lightning Ninja">⚡</div>
+                            <div class="avatar-option" data-avatar="🧙" title="Pixel Mage">🧙</div>
+                            <div class="avatar-option" data-avatar="🤖" title="Robo Hacker">🤖</div>
+                            <div class="avatar-option" data-avatar="🐱" title="Code Kitty">🐱</div>
+                            <div class="avatar-option" data-avatar="👾" title="Cyber Snake">👾</div>
+                            <div class="avatar-option" data-avatar="🎮" title="Arcade Hero">🎮</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="pixel-btn pixel-btn-primary" style="width: 100%; margin-top: 10px; font-size: 1.05rem; padding: 14px;">
+                        <span>🚀 เริ่มภารกิจพิชิตโค้ด (Start Quest)</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/register.js"></script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปผลและตารางอันดับ | Python Quest: Codédex Edition (ม.3)</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230f172a'/><rect x='4' y='2' width='8' height='3' fill='%23a855f7'/><rect x='3' y='5' width='10' height='7' fill='%2322c55e'/><rect x='5' y='6' width='2' height='2' fill='%23000'/><rect x='9' y='6' width='2' height='2' fill='%23000'/><rect x='7' y='12' width='2' height='3' fill='%23ef4444'/></svg>">
+
+    <!-- Google Fonts for Retro Pixel & Thai Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- App Retro Pixel Stylesheet & Print Stylesheet -->
+    <link rel="stylesheet" href="css/retro-pixel.css">
+    <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+
+    <!-- CRT Scanlines Overlay Effect -->
+    <div class="crt-overlay" id="crt-overlay"></div>
+
+    <!-- PAGE 3: SUMMARY & LEADERBOARD (หน้าสรุปผล ตารางอันดับ และพิมพ์ใบรายงานผล) -->
+    <main class="page-summary" id="summary-app">
+        <!-- Top Navigation Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: gap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.6rem;">🐍</span>
+                <div>
+                    <h2 class="pixel-text" style="font-size: 0.9rem; color: var(--text-cyan);">PYTHON QUEST</h2>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">ผลการประเมินวิชาวิทยาการคำนวณ ม.3</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" class="pixel-btn pixel-btn-primary" id="btn-top-back-arena">
+                    <span>🎮 กลับไปหน้าแบบฝึกหัด (Arena)</span>
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-dark" id="btn-top-new-user">
+                    <span>👤 เปลี่ยนผู้ใช้</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Victory & Title Stamp Card -->
+        <div class="summary-hero-card">
+            <h1 class="pixel-text" style="color: var(--text-cyan); font-size: 1.5rem; margin-bottom: 12px;">
+                QUEST COMPLETED!
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1rem;">
+                ยินดีด้วย! คุณได้เสร็จสิ้นการผจญภัยในระบบทดสอบการเขียนโปรแกรมภาษา Python
+            </p>
+
+            <!-- Retro Stamp Badge -->
+            <div class="summary-stamp-badge" id="summary-stamp-container">
+                <div class="stamp-title" id="summary-stamp-title">👑 PYTHON GRANDMASTER</div>
+                <div class="stamp-thai" id="summary-stamp-thai">ปรมาจารย์ไพทอนแห่ง ม.3</div>
+            </div>
+
+            <!-- Score Cards -->
+            <div class="summary-score-grid">
+                <div class="score-box">
+                    <div class="score-box-num" id="summary-score-xp">100</div>
+                    <div class="score-box-label">คะแนน XP รวม (เต็ม 100)</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-box-num" id="summary-score-quests">10 / 10</div>
+                    <div class="score-box-label">ภารกิจที่ผ่านสำเร็จ</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-box-num" id="summary-score-rank">#1</div>
+                    <div class="score-box-label">อันดับในชั้นเรียน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Leaderboard Section -->
+        <div class="leaderboard-card">
+            <h2 class="leaderboard-title">
+                <span>🏆 ตารางจัดอันดับการแข่งขันในชั้นเรียน (Leaderboard)</span>
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">อันดับ</th>
+                            <th>นักเรียน</th>
+                            <th>ห้อง</th>
+                            <th>เลขที่</th>
+                            <th>ฉายา</th>
+                            <th>สถานะ</th>
+                            <th style="text-align: right;">คะแนน XP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-tbody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 10 Quests Score & Rubric Review Table -->
+        <div class="review-table-card">
+            <h2 class="leaderboard-title" style="color: var(--text-cyan);">
+                <span>📋 รายงานผลการประเมินแยกตามรายข้อ (10 ภารกิจ)</span>
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ข้อที่</th>
+                            <th>สาระการเรียนรู้ / หัวข้อ</th>
+                            <th>ระดับ</th>
+                            <th>คะแนนเต็ม</th>
+                            <th>คะแนนที่ได้</th>
+                            <th style="text-align: center;">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quests-review-tbody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div class="summary-actions-footer">
+            <button type="button" class="pixel-btn pixel-btn-primary" id="btn-print-report" style="font-size: 1rem; padding: 14px 24px;">
+                <span>🖨️ พิมพ์ใบรายงานผล (Print Report สำหรับส่งครู)</span>
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-success" id="btn-export-csv" style="font-size: 1rem; padding: 14px 20px;">
+                <span>📥 ส่งออกคะแนน (Export CSV)</span>
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-dark" id="btn-back-to-arena" style="font-size: 1rem; padding: 14px 20px;">
+                <span>🎮 กลับไปแก้ไข / ซ้อมต่อใน Arena</span>
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-dark" id="btn-reset-all" style="font-size: 0.9rem; padding: 14px 18px; color: var(--text-red);">
+                <span>⚠️ ล้างข้อมูล & เริ่มใหม่</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- ====================================================================
+         PRINTABLE A4 CERTIFICATE & LAB REPORT (FOR TEACHER SUBMISSION)
+         Automatically shown when window.print() is called
+         ==================================================================== -->
+    <div id="printable-report">
+        <div class="cert-frame">
+            <div>
+                <div class="cert-header">
+                    <div class="cert-school-title">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี โรงเรียนมัธยมศึกษา</div>
+                    <div class="cert-doc-title">ใบรายงานผลการปฏิบัติการเขียนโปรแกรมภาษา Python เบื้องต้น</div>
+                    <div class="cert-subtitle">การทดสอบภาคปฏิบัติผ่านระบบเกมจำลองสถานการณ์เสมือนจริง (ระดับชั้นมัธยมศึกษาปีที่ 3)</div>
+                </div>
+
+                <!-- Student Information Block -->
+                <div class="cert-student-info">
+                    <div class="info-item">
+                        <span class="info-label">ชื่อ - นามสกุล:</span>
+                        <span class="info-value" id="print-student-name">เด็กชาย...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">ชั้นมัธยมศึกษา:</span>
+                        <span class="info-value" id="print-student-grade">ม.3/1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">เลขที่:</span>
+                        <span class="info-value" id="print-student-no">12</span>
+                    </div>
+                </div>
+
+                <!-- Score & Stamp Highlight -->
+                <div class="cert-highlight-row">
+                    <div>
+                        <div class="cert-score-big" id="print-total-xp">100 / 100 XP</div>
+                        <div class="cert-score-sub" id="print-percentage">ระดับผลการประเมิน: ดีเยี่ยมยอด (100%)</div>
+                    </div>
+                    <div class="cert-rank-badge">
+                        <div class="cert-rank-name" id="print-rank-title">👑 Python Grandmaster</div>
+                        <div class="cert-rank-thai" id="print-rank-thai">ปรมาจารย์ไพทอนแห่ง ม.3</div>
+                    </div>
+                </div>
+
+                <!-- 10 Questions Evaluation Table -->
+                <table class="cert-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">ข้อ</th>
+                            <th>หัวข้อและสาระการเรียนรู้ที่ทดสอบ</th>
+                            <th style="width: 70px;">ระดับ</th>
+                            <th style="width: 70px;">คะแนนเต็ม</th>
+                            <th style="width: 70px;">คะแนนที่ได้</th>
+                            <th style="width: 80px;">ผลการตรวจ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="print-table-tbody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Signatures Section -->
+            <div class="cert-signatures">
+                <div class="cert-notes-box">
+                    <strong>ข้อเสนอแนะ / ความเห็นของครูผู้สอน:</strong> ...................................................................................................................................................................................................................
+                </div>
+                <div class="sign-row">
+                    <div class="sign-col">
+                        <div class="sign-line"></div>
+                        <div>( ................................................................ )</div>
+                        <div style="font-size: 9pt; color: #64748b; margin-top: 2px;">ลายมือชื่อนักเรียนผู้รับการทดสอบ</div>
+                        <div style="margin-top: 4px;" id="print-date-student">วันที่ ..... / ..... / .........</div>
+                    </div>
+                    <div class="sign-col">
+                        <div class="sign-line"></div>
+                        <div>( ................................................................ )</div>
+                        <div style="font-size: 9pt; color: #64748b; margin-top: 2px;">ครูผู้สอนวิชาวิทยาการคำนวณ</div>
+                        <div style="margin-top: 4px;">วันที่ ..... / ..... / .........</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="vendor/confetti.min.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/quests.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/summary.js"></script>
+</body>
+</html>
+

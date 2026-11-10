@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมรภูมิโค้ด | Python Quest: Codédex Edition (ม.3)</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230f172a'/><rect x='4' y='2' width='8' height='3' fill='%23a855f7'/><rect x='3' y='5' width='10' height='7' fill='%2322c55e'/><rect x='5' y='6' width='2' height='2' fill='%23000'/><rect x='9' y='6' width='2' height='2' fill='%23000'/><rect x='7' y='12' width='2' height='3' fill='%23ef4444'/></svg>">
+
+    <!-- Google Fonts for Retro Pixel & Thai Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CodeMirror Editor Styles -->
+    <link rel="stylesheet" href="vendor/codemirror.min.css">
+    <link rel="stylesheet" href="vendor/dracula.min.css">
+
+    <!-- App Retro Pixel Stylesheet -->
+    <link rel="stylesheet" href="css/retro-pixel.css">
+</head>
+<body>
+
+    <!-- CRT Scanlines Overlay Effect -->
+    <div class="crt-overlay" id="crt-overlay"></div>
+
+    <!-- PAGE 2: QUEST ARENA (หน้าเล่นเกมและทำแบบฝึกหัด - Split Screen 2 ฝั่ง) -->
+    <div class="page-arena" id="arena-app">
+        <!-- Sticky Header Bar -->
+        <header class="arena-header">
+            <div class="header-brand">
+                <span class="brand-icon">🐍</span>
+                <div>
+                    <div class="brand-name">PYTHON QUEST</div>
+                    <span class="brand-badge">ม.3 CODÉDEX</span>
+                </div>
+            </div>
+
+            <!-- Student Info Display Chip -->
+            <div class="header-student-chip">
+                <span class="student-avatar" id="header-student-avatar">⚡</span>
+                <div class="student-meta">
+                    <span class="student-name" id="header-student-name">นักเรียน</span>
+                    <span class="student-sub" id="header-student-sub">ม.3/1 • เลขที่ 1</span>
+                </div>
+            </div>
+
+            <!-- XP Progress Bar -->
+            <div class="header-xp-container">
+                <div class="xp-bar-outer">
+                    <div class="xp-bar-inner" id="header-xp-fill"></div>
+                </div>
+                <div class="xp-label-group">
+                    <span class="xp-text" id="header-xp-text">0 / 100 XP</span>
+                    <span class="xp-rank-title" id="header-rank-title">Novice</span>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="header-actions">
+                <button type="button" class="icon-btn" id="btn-cheatsheet" title="เปิดสมุดสรุปไวยากรณ์ Python ม.3">
+                    <span>📖 สรุปสูตร</span>
+                </button>
+                <button type="button" class="icon-btn" id="btn-toggle-sound" title="เปิด/ปิดเสียงเอฟเฟกต์">
+                    <span id="sound-icon">🔊</span>
+                </button>
+                <button type="button" class="icon-btn" id="btn-toggle-crt" title="เปิด/ปิดโหมดจอเรโทร CRT">
+                    <span>📺</span>
+                </button>
+                <button type="button" class="icon-btn" id="btn-goto-summary" title="ดูผลคะแนนและตารางอันดับ">
+                    <span>🏆 สรุปผล</span>
+                </button>
+                <button type="button" class="icon-btn" id="btn-teacher-mode" title="โหมดครูผู้สอน / เฉลย & จัดการคะแนน">
+                    <span>🔑 ครู</span>
+                </button>
+                <button type="button" class="icon-btn" id="btn-switch-user" title="เปลี่ยนผู้ใช้งาน / กลับหน้าแรก">
+                    <span>👤 ผู้ใช้</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Quest Selector Ribbon (Quests 1 - 10) -->
+        <nav class="quest-selector-ribbon" id="quest-selector-ribbon">
+            <!-- Dynamically populated 1 to 10 tab buttons -->
+        </nav>
+
+        <!-- Split Screen Arena Layout -->
+        <main class="arena-split-container">
+            <!-- Left Side: Quest Card Details -->
+            <div class="quest-card-pane">
+                <div class="quest-top-badges">
+                    <div class="quest-num-badge" id="quest-card-num">ภารกิจที่ 1 / 10</div>
+                    <div class="quest-meta-tags">
+                        <span class="tag-difficulty easy" id="quest-card-difficulty">ง่าย</span>
+                        <span class="tag-xp" id="quest-card-xp">+10 XP</span>
+                    </div>
+                </div>
+
+                <h2 class="quest-title" id="quest-card-title">ชื่อภารกิจ</h2>
+
+                <!-- Lore Flavor Story -->
+                <div class="quest-lore-box" id="quest-card-lore">
+                    เนื้อเรื่องประกอบภารกิจ
+                </div>
+
+                <!-- Quest Task & Instructions -->
+                <div class="quest-section-title">
+                    <span>📜 คำอธิบายโจทย์ & ภารกิจที่ต้องทำ</span>
+                </div>
+                <div class="quest-instruction" id="quest-card-instruction">
+                    คำสั่งและรายละเอียดโจทย์
+                </div>
+
+                <!-- Real-time Verification Checklist -->
+                <div class="quest-section-title">
+                    <span>✅ เงื่อนไขที่ต้องทำ (Checklist)</span>
+                </div>
+                <div class="checklist-container" id="quest-checklist-container">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Expected Output Preview -->
+                <div class="quest-section-title">
+                    <span>🎯 ตัวอย่างผลลัพธ์ใน Terminal ที่ต้องการ</span>
+                </div>
+                <div class="expected-output-box" id="quest-expected-output">
+                    Hello, Python!
+                </div>
+
+                <!-- Hints Accordion -->
+                <div class="hint-accordion">
+                    <div class="hint-header" id="hint-toggle-btn">
+                        <span>💡 ตัวช่วย / คำแนะนำสำหรับภารกิจนี้ (Hints)</span>
+                        <span id="hint-arrow">▼</span>
+                    </div>
+                    <div class="hint-body" id="hint-body-content">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Quest Navigation Footer -->
+                <div class="quest-nav-footer">
+                    <button type="button" class="pixel-btn pixel-btn-dark" id="btn-prev-quest">
+                        <span>◀ ภารกิจก่อนหน้า</span>
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-dark" id="btn-next-quest">
+                        <span>ภารกิจถัดไป ▶</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side: Code Playground -->
+            <div class="playground-pane">
+                <!-- Editor Toolbar -->
+                <div class="editor-toolbar">
+                    <div class="editor-file-tab">
+                        <span>🐍</span>
+                        <span>main.py</span>
+                    </div>
+                    <div class="editor-tools">
+                        <button type="button" class="tool-btn" id="btn-reset-code" title="รีเซ็ตโค้ดกลับเป็นค่าเริ่มต้น">
+                            <span>🔄 รีเซ็ตโค้ด</span>
+                        </button>
+                        <button type="button" class="tool-btn" id="btn-zoom-in" title="ขยายขนาดฟอนต์">
+                            <span>A+</span>
+                        </button>
+                        <button type="button" class="tool-btn" id="btn-zoom-out" title="ย่อขนาดฟอนต์">
+                            <span>A-</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CodeMirror Code Editor Area -->
+                <div class="codemirror-wrapper">
+                    <textarea id="python-code-editor"></textarea>
+                </div>
+
+                <!-- Editor Action Bar -->
+                <div class="editor-action-bar">
+                    <div class="keyboard-tip">
+                        <span>⌨️ กด <strong>Ctrl + Enter</strong> เพื่อรันโค้ด</span>
+                    </div>
+                    <div class="action-buttons-group">
+                        <button type="button" class="pixel-btn pixel-btn-dark" id="btn-run-code">
+                            <span>▶ รันโค้ด (Run)</span>
+                        </button>
+                        <button type="button" class="pixel-btn pixel-btn-success" id="btn-submit-answer">
+                            <span>🚀 ส่งคำตอบ (Submit)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Validation Result Alert Banner -->
+                <div class="validation-banner" id="validation-banner">
+                    <div class="validation-msg">
+                        <span id="validation-icon">🎉</span>
+                        <span id="validation-text">ผ่านภารกิจแล้ว!</span>
+                    </div>
+                    <button type="button" class="pixel-btn pixel-btn-primary" id="btn-banner-next" style="display: none; padding: 4px 10px; font-size: 0.8rem;">
+                        <span>ลุยข้อต่อไป ▶</span>
+                    </button>
+                </div>
+
+                <!-- Terminal Console Panel -->
+                <div class="terminal-panel">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <span class="terminal-status-dot" id="terminal-dot"></span>
+                            <span>TERMINAL OUTPUT (PYTHON 3.12 ENGINE)</span>
+                        </div>
+                        <button type="button" class="tool-btn" id="btn-clear-terminal">
+                            <span>🗑️ เคลียร์จอ</span>
+                        </button>
+                    </div>
+                    <div class="terminal-body" id="terminal-output-area">
+                        <span class="terminal-prompt">&gt; Python Quest Ready. กด "รันโค้ด" เพื่อดูผลลัพธ์</span>
+                        <span class="terminal-cursor"></span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: PYTHON CHEAT SHEET (สมุดสรุปไวยากรณ์ ม.3)
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modal-cheatsheet">
+        <div class="modal-box" style="max-width: 750px;">
+            <div class="modal-header">
+                <h3 class="modal-title">📖 สมุดสรุปสูตรไวยากรณ์ Python เบื้องต้น (ม.3)</h3>
+                <button type="button" class="modal-close-btn" id="btn-close-cheatsheet">✕</button>
+            </div>
+            <div style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.6; display: flex; flex-direction: column; gap: 14px;">
+                <div style="background: var(--bg-surface); border-left: 3px solid var(--border-neon); padding: 10px 14px; border-radius: 4px;">
+                    <strong style="color: var(--text-cyan);">1. คำสั่ง print() แสดงผลข้อความและตัวเลข</strong>
+                    <pre style="background: #090d16; padding: 8px; border-radius: 4px; margin-top: 6px; font-family: var(--font-code); color: #7dd3fc;">print("ข้อความ")           # แสดงข้อความ
+print(10 + 20)            # แสดงผลการคำนวณ 30
+print("คะแนน:", 100)       # คั่นด้วยจุลภาค (,) มีเว้นวรรคอัตโนมัติ</pre>
+                </div>
+
+                <div style="background: var(--bg-surface); border-left: 3px solid var(--border-green); padding: 10px 14px; border-radius: 4px;">
+                    <strong style="color: var(--text-green);">2. การเขียน Comment บันทึกความคิด (#)</strong>
+                    <pre style="background: #090d16; padding: 8px; border-radius: 4px; margin-top: 6px; font-family: var(--font-code); color: #86efac;"># คอมเมนต์ขึ้นต้นด้วยเครื่องหมาย # คอมพิวเตอร์จะไม่นำมารัน</pre>
+                </div>
+
+                <div style="background: var(--bg-surface); border-left: 3px solid var(--border-yellow); padding: 10px 14px; border-radius: 4px;">
+                    <strong style="color: var(--text-yellow);">3. ตัวดำเนินการทางคณิตศาสตร์และลำดับความสำคัญ (PEMDAS)</strong>
+                    <pre style="background: #090d16; padding: 8px; border-radius: 4px; margin-top: 6px; font-family: var(--font-code); color: #fde047;">+ (บวก)  - (ลบ)  * (คูณ)  / (หาร)
+ลำดับ: คูณและหารทำก่อนบวกและลบเสมอ!
+ถ้าต้องการให้บวกก่อน ต้องใส่วงเล็บ: (price1 + price2) / 2</pre>
+                </div>
+
+                <div style="background: var(--bg-surface); border-left: 3px solid var(--border-purple); padding: 10px 14px; border-radius: 4px;">
+                    <strong style="color: var(--text-purple);">4. การสร้างตัวแปร (Variables)</strong>
+                    <pre style="background: #090d16; padding: 8px; border-radius: 4px; margin-top: 6px; font-family: var(--font-code); color: #c084fc;">name = "กอน"       # ข้อความ (str) ต้องใส่เครื่องหมายคำพูด
+score = 100        # ตัวเลข (int) ไม่ต้องใส่เครื่องหมายคำพูด
+total = num1 + num2 # ตัวแปรสามารถนำมาคำนวณกันได้</pre>
+                </div>
+            </div>
+            <div style="margin-top: 18px; text-align: right;">
+                <button type="button" class="pixel-btn pixel-btn-primary" id="btn-close-cheatsheet-bottom">เข้าใจแล้ว ลุยต่อ!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: TEACHER ADMIN PANEL (โหมดครูผู้สอน)
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modal-teacher">
+        <div class="modal-box" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title">🔑 โหมดครูผู้สอน (Teacher Master Control)</h3>
+                <button type="button" class="modal-close-btn" id="btn-close-teacher">✕</button>
+            </div>
+            <div id="teacher-auth-section">
+                <p style="color: #cbd5e1; margin-bottom: 12px;">กรุณากรอกรหัสผ่านครูผู้สอน (รหัสเริ่มต้น: <strong>teacher</strong> หรือ <strong>1234</strong>)</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                    <input type="password" id="teacher-passcode" class="form-input" placeholder="กรอกรหัสผ่าน" style="flex: 1;">
+                    <button type="button" class="pixel-btn pixel-btn-primary" id="btn-teacher-login">เข้าสู่ระบบ</button>
+                </div>
+            </div>
+
+            <div id="teacher-dashboard-section" style="display: none;">
+                <p style="color: var(--text-green); font-weight: 600; margin-bottom: 14px;">✅ ยืนยันสิทธิ์ครูผู้สอนเรียบร้อย</p>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                    <button type="button" class="pixel-btn pixel-btn-success" id="btn-teacher-unlock-all">
+                        <span>🔓 ปลดล็อกผ่านทุกข้อ (100 XP) สำหรับสาธิต</span>
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-primary" id="btn-teacher-export-csv">
+                        <span>📥 ส่งออกคะแนนห้องเรียน (CSV)</span>
+                    </button>
+                </div>
+
+                <h4 style="color: var(--text-cyan); margin-bottom: 8px;">เฉลยแนวคำตอบทั้ง 10 ภารกิจ:</h4>
+                <div id="teacher-solutions-list" style="max-height: 250px; overflow-y: auto; background: #090d16; border: 1px solid #334155; border-radius: 4px; padding: 12px; font-family: var(--font-code); font-size: 0.85rem;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: RESET / USER SWITCH CONFIRMATION
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modal-confirm">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-confirm-title">ยืนยันการดำเนินการ</h3>
+                <button type="button" class="modal-close-btn" id="btn-close-modal">✕</button>
+            </div>
+            <p id="modal-confirm-desc" style="color: #cbd5e1; margin-bottom: 20px;">
+                คุณต้องการเปลี่ยนผู้ใช้งานหรือเริ่มต้นใหม่ใช่หรือไม่?
+            </p>
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" class="pixel-btn pixel-btn-dark" id="btn-modal-cancel">ยกเลิก</button>
+                <button type="button" class="pixel-btn pixel-btn-primary" id="btn-modal-ok">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="vendor/codemirror.min.js"></script>
+    <script src="vendor/python.min.js"></script>
+    <script src="vendor/skulpt.min.js"></script>
+    <script src="vendor/skulpt-stdlib.js"></script>
+    <script src="vendor/confetti.min.js"></script>
+
+    <!-- App Business Logic -->
+    <script src="js/audio.js"></script>
+    <script src="js/quests.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/validator.js"></script>
+    <script src="js/arena.js"></script>
+</body>
+</html>
+

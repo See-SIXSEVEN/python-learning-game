@@ -1,0 +1,218 @@
+/* ==========================================================================
+   PRINT STYLESHEET: A4 CERTIFICATE & LAB REPORT CARD
+   For printing and submitting to the teacher
+   ========================================================================== */
+
+#printable-report {
+    display: none;
+}
+
+@media print {
+    /* Hide everything on screen except printable certificate */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Prompt', 'Sarabun', -apple-system, sans-serif !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-image: none !important;
+    }
+
+    .crt-overlay,
+    .screen-view,
+    .modal-backdrop,
+    .toast-container,
+    .arena-header,
+    .quest-selector-ribbon,
+    .editor-action-bar,
+    .terminal-panel,
+    button {
+        display: none !important;
+    }
+
+    #printable-report {
+        display: block !important;
+        width: 100% !important;
+        max-width: 210mm !important; /* A4 width */
+        min-height: 297mm !important; /* A4 height */
+        margin: 0 auto !important;
+        padding: 16mm 20mm !important;
+        box-sizing: border-box !important;
+        background: #ffffff !important;
+        color: #1e293b !important;
+        position: relative !important;
+    }
+
+    .cert-frame {
+        border: 4px double #1e3a8a;
+        padding: 24px;
+        min-height: 265mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+
+    .cert-header {
+        text-align: center;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+
+    .cert-school-title {
+        font-size: 15pt;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 4px;
+    }
+
+    .cert-doc-title {
+        font-size: 18pt;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+    }
+
+    .cert-subtitle {
+        font-size: 11pt;
+        color: #64748b;
+    }
+
+    /* Student Info Box */
+    .cert-student-info {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 12px;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        padding: 12px 18px;
+        border-radius: 6px;
+        margin-bottom: 18px;
+        font-size: 11pt;
+    }
+
+    .info-item {
+        display: flex;
+        gap: 6px;
+    }
+
+    .info-label {
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .info-value {
+        color: #0f172a;
+        font-weight: 600;
+        border-bottom: 1px dotted #94a3b8;
+        flex: 1;
+    }
+
+    /* Score & Badge Highlight */
+    .cert-highlight-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 2px solid #0284c7;
+        background: #f0f9ff;
+        padding: 14px 20px;
+        border-radius: 6px;
+        margin-bottom: 18px;
+    }
+
+    .cert-score-big {
+        font-size: 26pt;
+        font-weight: 800;
+        color: #0284c7;
+    }
+
+    .cert-score-sub {
+        font-size: 10pt;
+        color: #0369a1;
+        font-weight: 600;
+    }
+
+    .cert-rank-badge {
+        text-align: right;
+    }
+
+    .cert-rank-name {
+        font-size: 16pt;
+        font-weight: 800;
+        color: #b45309;
+    }
+
+    .cert-rank-thai {
+        font-size: 11pt;
+        color: #78350f;
+    }
+
+    /* Results Table */
+    .cert-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.5pt;
+        margin-bottom: 20px;
+    }
+
+    .cert-table th {
+        background: #f1f5f9;
+        border: 1px solid #94a3b8;
+        padding: 6px 8px;
+        text-align: center;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .cert-table td {
+        border: 1px solid #cbd5e1;
+        padding: 6px 8px;
+        text-align: left;
+    }
+
+    .cert-table td.center {
+        text-align: center;
+    }
+
+    .cert-status-pass {
+        color: #15803d;
+        font-weight: 700;
+    }
+
+    /* Teacher Feedback & Signatures */
+    .cert-signatures {
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px dashed #cbd5e1;
+    }
+
+    .cert-notes-box {
+        margin-bottom: 24px;
+        font-size: 10pt;
+    }
+
+    .sign-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 30px;
+    }
+
+    .sign-col {
+        text-align: center;
+        width: 250px;
+        font-size: 10.5pt;
+    }
+
+    .sign-line {
+        margin-top: 40px;
+        border-bottom: 1px solid #475569;
+        margin-bottom: 6px;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
+}
+
