@@ -416,43 +416,6 @@ class ArenaController {
             modalCheat.classList.remove('active');
         });
 
-        // Teacher Panel Modal
-        const modalTeacher = document.getElementById('modal-teacher');
-        document.getElementById('btn-teacher-mode').addEventListener('click', () => {
-            modalTeacher.classList.add('active');
-            window.soundFX.playClick();
-        });
-        document.getElementById('btn-close-teacher').addEventListener('click', () => {
-            modalTeacher.classList.remove('active');
-        });
-
-        document.getElementById('btn-teacher-login').addEventListener('click', () => {
-            const pin = document.getElementById('teacher-passcode').value.trim();
-            if (pin === 'teacher' || pin === '1234') {
-                document.getElementById('teacher-auth-section').style.display = 'none';
-                document.getElementById('teacher-dashboard-section').style.display = 'block';
-                this.renderTeacherSolutions();
-                window.soundFX.playSuccess();
-            } else {
-                alert("รหัสผ่านไม่ถูกต้อง (รหัสเริ่มต้น: teacher หรือ 1234)");
-            }
-        });
-
-        document.getElementById('btn-teacher-unlock-all').addEventListener('click', () => {
-            const progress = window.storageManager.getProgress();
-            window.QUESTS.forEach(q => {
-                window.storageManager.markQuestPassed(q.id, q.solutionCode, 20);
-            });
-            this.updateXPBar();
-            this.renderQuestRibbon();
-            this.showToast("🔓 ปลดล็อก 100 XP ครบทั้ง 5 ข้อแล้ว!");
-            modalTeacher.classList.remove('active');
-        });
-
-        document.getElementById('btn-teacher-export-csv').addEventListener('click', () => {
-            this.exportCSV();
-        });
-
         // Navigation to Summary Page
         document.getElementById('btn-goto-summary').addEventListener('click', () => {
             window.soundFX.playClick();
@@ -474,39 +437,6 @@ class ArenaController {
         const modalConfirm = document.getElementById('modal-confirm');
         document.getElementById('btn-close-modal').addEventListener('click', () => modalConfirm.classList.remove('active'));
         document.getElementById('btn-modal-cancel').addEventListener('click', () => modalConfirm.classList.remove('active'));
-    }
-
-    renderTeacherSolutions() {
-        const list = document.getElementById('teacher-solutions-list');
-        list.innerHTML = '';
-        window.QUESTS.forEach(q => {
-            const div = document.createElement('div');
-            div.style.marginBottom = '12px';
-            div.innerHTML = `
-                <div style="color: var(--text-yellow); font-weight: bold; margin-bottom: 4px;">ภารกิจที่ ${q.id}: ${q.title} (${q.category})</div>
-                <pre style="background: #1e293b; color: #a5f3fc; padding: 6px; border-radius: 4px; overflow-x: auto;">${this.escapeHtml(q.solutionCode)}</pre>
-            `;
-            list.appendChild(div);
-        });
-    }
-
-    exportCSV() {
-        const student = window.storageManager.getStudent();
-        const progress = window.storageManager.getProgress();
-        const leaderboard = window.storageManager.getCombinedLeaderboard();
-
-        let csv = "\uFEFFลำดับ,ชื่อ-นามสกุล,ห้อง,เลขที่,คะแนน XP,ฉายา,สถานะ\n";
-        leaderboard.forEach((entry, idx) => {
-            csv += `${idx + 1},"${entry.name}","${entry.grade}","${entry.no}",${entry.xp},"${entry.badge}","${entry.time}"\n`;
-        });
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `python_quest_scores_${student ? student.grade.replace('/', '_') : 'm3'}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
     }
 
     openConfirmModal(title, desc, onConfirm) {

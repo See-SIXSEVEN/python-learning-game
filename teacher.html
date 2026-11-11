@@ -36,13 +36,16 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 10px;">
-                <a href="index.html" class="pixel-btn pixel-btn-dark" style="text-decoration: none; font-size: 0.85rem; padding: 8px 14px;">
-                    <span>🏠 หน้าแรกนักเรียน</span>
-                </a>
-                <a href="quest.html" class="pixel-btn pixel-btn-dark" style="text-decoration: none; font-size: 0.85rem; padding: 8px 14px;">
-                    <span>🎮 หน้าทำแบบฝึกหัด</span>
-                </a>
+                <button type="button" class="pixel-btn pixel-btn-dark" id="btn-change-pin" style="display: none; font-size: 0.85rem; padding: 8px 14px;">
+                    <span>🔐 เปลี่ยนรหัสผ่าน</span>
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-danger" id="btn-teacher-logout" style="display: none; font-size: 0.85rem; padding: 8px 14px;">
+                    <span>🚪 ออกจากระบบ</span>
+                </button>
                 <button type="button" class="pixel-btn pixel-btn-primary" id="btn-sync-sheets" style="font-size: 0.85rem; padding: 8px 14px;">
+                    <span>📊 เชื่อม Google Sheets</span>
+                </button>
+            </div>
                     <span>📊 เชื่อม Google Sheets</span>
                 </button>
             </div>
@@ -55,8 +58,7 @@
                 ยืนยันตัวตนครูผู้สอน
             </h2>
             <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">
-                กรุณากรอกรหัสผ่านเพื่อเข้าถึงแดชบอร์ดสรุปคะแนนนักเรียน<br>
-                (รหัสเริ่มต้น: <strong style="color: var(--text-yellow);">teacher</strong> หรือ <strong style="color: var(--text-yellow);">1234</strong>)
+                สงวนสิทธิ์เฉพาะครูผู้สอนประจำวิชาเท่านั้น กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบ
             </p>
             <form id="teacher-pin-form">
                 <input type="password" id="teacher-pin-input" class="form-input" placeholder="กรอกรหัส PIN" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 16px;" autofocus required>

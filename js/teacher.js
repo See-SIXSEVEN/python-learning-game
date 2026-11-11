@@ -5,6 +5,31 @@ class TeacherDashboard {
         this.allStudents = [];
         this.selectedGrade = 'ALL';
         this.searchQuery = '';
+        this.PIN_KEY = 'pyquest_teacher_custom_pin';
+        // Default PIN hash (SHA-256 of "krupython")
+        this.DEFAULT_PIN_HASH = '89c774f4fda687fcca2963a5b1c21eb844a644b5838531a1e706088d27f17eef';
+    }
+
+    async hashPin(str) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const hashBuf = await crypto.subtle.digest('SHA-256', data);
+        const hashArr = Array.from(new Uint8Array(hashBuf));
+        return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    getStoredPinHash() {
+        return localStorage.getItem(this.PIN_KEY) || this.DEFAULT_PIN_HASH;
+    }
+
+    async verifyPin(inputPin) {
+        const hash = await this.hashPin(inputPin);
+        return hash === this.getStoredPinHash();
+    }
+
+    async setCustomPin(newPin) {
+        const hash = await this.hashPin(newPin);
+        localStorage.setItem(this.PIN_KEY, hash);
     }
 
     init() {
@@ -19,19 +44,55 @@ class TeacherDashboard {
         // PIN Form Login
         const pinForm = document.getElementById('teacher-pin-form');
         if (pinForm) {
-            pinForm.addEventListener('submit', (e) => {
+            pinForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const pin = document.getElementById('teacher-pin-input').value.trim();
-                if (pin === 'teacher' || pin === '1234') {
+                const isValid = await this.verifyPin(pin);
+                if (isValid) {
                     sessionStorage.setItem('teacher_auth', 'true');
                     window.soundFX.playSuccess();
                     this.showDashboard();
                 } else {
                     window.soundFX.playError();
-                    alert("รหัสผ่านไม่ถูกต้อง (รหัสเริ่มต้น: teacher หรือ 1234)");
+                    alert("รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
                     document.getElementById('teacher-pin-input').value = '';
                     document.getElementById('teacher-pin-input').focus();
                 }
+            });
+        }
+
+        // Logout
+        const btnLogout = document.getElementById('btn-teacher-logout');
+        if (btnLogout) {
+            btnLogout.addEventListener('click', () => {
+                sessionStorage.removeItem('teacher_auth');
+                window.location.reload();
+            });
+        }
+
+        // Change PIN
+        const btnChangePin = document.getElementById('btn-change-pin');
+        if (btnChangePin) {
+            btnChangePin.addEventListener('click', async () => {
+                const currentPin = prompt("กรุณากรอกรหัสผ่านปัจจุบัน:");
+                if (!currentPin) return;
+                const isValid = await this.verifyPin(currentPin);
+                if (!isValid) {
+                    alert("รหัสผ่านปัจจุบันไม่ถูกต้อง!");
+                    return;
+                }
+                const newPin = prompt("กรุณากรอกรหัสผ่านใหม่ที่ต้องการ (อย่างน้อย 4 ตัวอักษร):");
+                if (!newPin || newPin.trim().length < 4) {
+                    alert("รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร!");
+                    return;
+                }
+                const confirmPin = prompt("ยืนยันรหัสผ่านใหม่อีกครั้ง:");
+                if (newPin !== confirmPin) {
+                    alert("รหัสผ่านทั้งสองช่องไม่ตรงกัน!");
+                    return;
+                }
+                await this.setCustomPin(newPin.trim());
+                alert("เปลี่ยนรหัสผ่านสำเร็จแล้ว! กรุณาจำรหัสผ่านใหม่นี้ไว้สำหรับการเข้าใช้งาน");
             });
         }
 
@@ -164,6 +225,10 @@ class TeacherDashboard {
     showDashboard() {
         document.getElementById('teacher-login-section').style.display = 'none';
         document.getElementById('teacher-main-dashboard').style.display = 'block';
+        const btnChangePin = document.getElementById('btn-change-pin');
+        const btnLogout = document.getElementById('btn-teacher-logout');
+        if (btnChangePin) btnChangePin.style.display = 'inline-flex';
+        if (btnLogout) btnLogout.style.display = 'inline-flex';
         this.loadData();
         this.renderTable();
     }

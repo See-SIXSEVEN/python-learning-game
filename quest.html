@@ -69,9 +69,6 @@
                 <button type="button" class="icon-btn" id="btn-goto-summary" title="ดูผลคะแนนและตารางอันดับ">
                     <span>🏆 สรุปผล</span>
                 </button>
-                <button type="button" class="icon-btn" id="btn-teacher-mode" title="โหมดครูผู้สอน / เฉลย & จัดการคะแนน">
-                    <span>🔑 ครู</span>
-                </button>
                 <button type="button" class="icon-btn" id="btn-switch-user" title="เปลี่ยนผู้ใช้งาน / กลับหน้าแรก">
                     <span>👤 ผู้ใช้</span>
                 </button>
@@ -263,44 +260,8 @@ total = num1 + num2 # ตัวแปรสามารถนำมาคำน�
     </div>
 
     <!-- ====================================================================
-         MODAL: TEACHER ADMIN PANEL (โหมดครูผู้สอน)
+         MODAL: TEACHER ADMIN PANEL (ลบออกเพื่อความปลอดภัย ไม่ให้นักเรียนเข้าถึงเฉลย)
          ==================================================================== -->
-    <div class="modal-backdrop" id="modal-teacher">
-        <div class="modal-box" style="max-width: 700px;">
-            <div class="modal-header">
-                <h3 class="modal-title">🔑 โหมดครูผู้สอน (Teacher Master Control)</h3>
-                <button type="button" class="modal-close-btn" id="btn-close-teacher">✕</button>
-            </div>
-            <div id="teacher-auth-section">
-                <p style="color: #cbd5e1; margin-bottom: 12px;">กรุณากรอกรหัสผ่านครูผู้สอน (รหัสเริ่มต้น: <strong>teacher</strong> หรือ <strong>1234</strong>)</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-                    <input type="password" id="teacher-passcode" class="form-input" placeholder="กรอกรหัสผ่าน" style="flex: 1;">
-                    <button type="button" class="pixel-btn pixel-btn-primary" id="btn-teacher-login">เข้าสู่ระบบ</button>
-                </div>
-            </div>
-
-            <div id="teacher-dashboard-section" style="display: none;">
-                <p style="color: var(--text-green); font-weight: 600; margin-bottom: 14px;">✅ ยืนยันสิทธิ์ครูผู้สอนเรียบร้อย</p>
-                
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-                    <a href="teacher.html" class="pixel-btn pixel-btn-primary" style="text-decoration: none;">
-                        <span>📊 เปิดแดชบอร์ดสรุปคะแนนเต็มจอ</span>
-                    </a>
-                    <button type="button" class="pixel-btn pixel-btn-success" id="btn-teacher-unlock-all">
-                        <span>🔓 ปลดล็อกทุกข้อ (100 XP) สำหรับสาธิต</span>
-                    </button>
-                    <button type="button" class="pixel-btn pixel-btn-dark" id="btn-teacher-export-csv">
-                        <span>📥 ส่งออกไฟล์ CSV</span>
-                    </button>
-                </div>
-
-                <h4 style="color: var(--text-cyan); margin-bottom: 8px;">เฉลยแนวคำตอบทั้ง 5 ภารกิจ:</h4>
-                <div id="teacher-solutions-list" style="max-height: 250px; overflow-y: auto; background: #090d16; border: 1px solid #334155; border-radius: 4px; padding: 12px; font-family: var(--font-code); font-size: 0.85rem;">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- ====================================================================
          MODAL: RESET / USER SWITCH CONFIRMATION
