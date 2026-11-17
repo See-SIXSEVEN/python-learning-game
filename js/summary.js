@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('summary-stamp-title').textContent = `${rank.badgeIcon} ${rank.title.toUpperCase()}`;
     document.getElementById('summary-stamp-thai').textContent = rank.thaiTitle;
     document.getElementById('summary-score-xp').textContent = `${totalXP} / 100`;
-    document.getElementById('summary-score-quests').textContent = `${progress.completedQuests.length} / 5`;
+    document.getElementById('summary-score-quests').textContent = `${progress.completedQuests.length} / 4`;
 
     // Render Leaderboard
     const leaderboard = window.storageManager.getCombinedLeaderboard();
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('summary-score-rank').textContent = `#${myRankNumber}`;
 
-    // Render 5 Quests Rubric Review
+    // Render 4 Quests Rubric Review
     const reviewTbody = document.getElementById('quests-review-tbody');
     reviewTbody.innerHTML = '';
 
@@ -81,10 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <td style="font-family: var(--font-pixel); text-align: center;">${q.id}</td>
             <td><strong>${q.category}</strong> ${q.title}</td>
             <td><span class="tag-difficulty ${q.difficultyClass}">${q.difficulty}</span></td>
-            <td>20 XP</td>
-            <td style="font-family: var(--font-pixel); color: ${isPassed ? 'var(--text-green)' : 'var(--text-muted)'};">${isPassed ? '20' : '0'} XP</td>
+            <td>25 XP</td>
+            <td style="font-family: var(--font-pixel); color: ${isPassed ? 'var(--text-green)' : 'var(--text-muted)'};">${isPassed ? '25' : '0'} XP</td>
             <td style="text-align: center;">
-                ${isPassed ? '<span style="color: var(--text-green); font-weight: bold;">✅ ผ่านแล้ว</span>' : '<span style="color: var(--text-muted);">⬜ ยังไม่สำเร็จ</span>'}
+                ${isPassed ? '<span style="color: var(--text-green); font-weight: bold;">✅ ส่งแล้ว</span>' : '<span style="color: var(--text-muted);">⬜ ยังไม่ส่ง</span>'}
             </td>
         `;
         reviewTbody.appendChild(tr);
@@ -162,9 +162,9 @@ function prepareAndPrintReport(student, progress, totalXP, rank) {
             <td class="center">${q.id}</td>
             <td><strong>${q.category}</strong>: ${q.title} (${q.instruction.replace(/<[^>]+>/g, '').substring(0, 50)}...)</td>
             <td class="center">${q.difficulty}</td>
-            <td class="center">20</td>
-            <td class="center"><strong>${isPassed ? '20' : '0'}</strong></td>
-            <td class="center ${isPassed ? 'cert-status-pass' : ''}">${isPassed ? '✔ ผ่าน' : '—'}</td>
+            <td class="center">25</td>
+            <td class="center"><strong>${isPassed ? '25' : '0'}</strong></td>
+            <td class="center ${isPassed ? 'cert-status-pass' : ''}">${isPassed ? '✔ ส่งแล้ว' : '—'}</td>
         `;
         printTbody.appendChild(tr);
     });

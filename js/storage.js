@@ -103,7 +103,7 @@ class StorageManager {
             total += (progress.questScores[qid] || 0);
         }
         progress.totalXP = total;
-        if (progress.completedQuests.length === 5 && !progress.finishTime) {
+        if (progress.completedQuests.length === 4 && !progress.finishTime) {
             progress.finishTime = new Date().toISOString();
         }
         localStorage.setItem(this.PROGRESS_KEY, JSON.stringify(progress));
@@ -257,6 +257,10 @@ class StorageManager {
 
         const existingIdx = list.findIndex(item => item.id === studentKey);
         if (existingIdx >= 0) {
+            // Preserve existing teacher grading if any
+            if (list[existingIdx].grading) {
+                record.grading = list[existingIdx].grading;
+            }
             list[existingIdx] = record;
         } else {
             list.push(record);
@@ -266,6 +270,32 @@ class StorageManager {
 
         // Sync with Google Sheets in background if configured
         this.sendToGoogleSheets(student, progress, record);
+    }
+
+    // Save Teacher Grading for a Student
+    saveGrading(studentId, scores, feedback) {
+        const raw = localStorage.getItem(this.SUBMISSIONS_KEY);
+        let list = raw ? JSON.parse(raw) : [];
+
+        const idx = list.findIndex(item => item.id === studentId);
+        if (idx >= 0) {
+            let total = 0;
+            for (const qId in scores) {
+                total += Number(scores[qId] || 0);
+            }
+
+            list[idx].grading = {
+                scores: scores,
+                totalScore: total,
+                feedback: feedback || "",
+                gradedAt: new Date().toLocaleString('th-TH'),
+                isGraded: true
+            };
+
+            localStorage.setItem(this.SUBMISSIONS_KEY, JSON.stringify(list));
+            return list[idx];
+        }
+        return null;
     }
 
     getAllSubmissions() {
@@ -293,7 +323,7 @@ class StorageManager {
                     xp: p.xp,
                     badge: p.badge,
                     thaiBadge: "คะแนนจากระบบ",
-                    completedQuests: [1, 2, 3, 4, 5].slice(0, Math.floor(p.xp / 20)),
+                    completedQuests: [1, 2, 3, 4].slice(0, Math.floor(p.xp / 25)),
                     questScores: {},
                     questCodes: { 1: 'print("Hello, Python!")' },
                     updatedAt: "ส่งแล้ว",
@@ -329,7 +359,7 @@ class StorageManager {
                 no: student.no,
                 xp: progress.totalXP || 0,
                 badge: record ? record.badge : "Python Quest",
-                completedQuests: `${(progress.completedQuests || []).length} / 5 ภารกิจ`,
+                completedQuests: `${(progress.completedQuests || []).length} / 4 ภารกิจ`,
                 timestamp: new Date().toISOString()
             };
 

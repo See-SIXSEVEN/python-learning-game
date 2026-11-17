@@ -139,7 +139,7 @@ class ArenaController {
         window.storageManager.saveProgress(progress);
 
         // Update Quest Info
-        document.getElementById('quest-card-num').textContent = `ภารกิจที่ ${quest.id} / 5 • ${quest.category}`;
+        document.getElementById('quest-card-num').textContent = `ภารกิจที่ ${quest.id} / 4 • ${quest.category}`;
         const diffBadge = document.getElementById('quest-card-difficulty');
         diffBadge.textContent = quest.difficulty;
         diffBadge.className = `tag-difficulty ${quest.difficultyClass}`;
@@ -193,7 +193,7 @@ class ArenaController {
         const btnNext = document.getElementById('btn-next-quest');
         if (btnPrev) btnPrev.disabled = questId === 1;
         if (btnNext) {
-            btnNext.innerHTML = questId === 5 ? '<span>สรุปผลภารกิจ 🏆</span>' : '<span>ภารกิจถัดไป ▶</span>';
+            btnNext.innerHTML = questId === 4 ? '<span>สรุปผลภารกิจ 🏆</span>' : '<span>ภารกิจถัดไป ▶</span>';
         }
     }
 
@@ -205,20 +205,19 @@ class ArenaController {
         const terminal = document.getElementById('terminal-output-area');
         terminal.innerHTML = `<span class="terminal-prompt">&gt; python3 main.py ... กำลังรันโค้ด</span>\n`;
 
-        const result = await window.questValidator.validateQuest(this.currentQuestId, code);
+        const result = await window.questValidator.runCode(code);
 
-        if (result.error) {
+        if (!result.success) {
             terminal.innerHTML += `<span class="terminal-error">${this.escapeHtml(result.error)}</span>\n`;
-            this.showValidationBanner(false, "เกิดข้อผิดพลาดในการรันโค้ด ตรวจสอบรายละเอียดใน Terminal ด้านล่าง");
+            this.showValidationBanner(false, "เกิดข้อผิดพลาดในการรันโค้ด ตรวจสอบรายละเอียดและแก้ไขใน Terminal ด้านล่าง");
         } else {
-            terminal.innerHTML += `<span style="color: #38bdf8;">${this.escapeHtml(result.output || '(ไม่มีผลลัพธ์การแสดงผล)')}</span>\n`;
-            this.updateChecklistUI(result.checklistResults);
-
-            if (result.success) {
-                this.showValidationBanner(true, "โค้ดทำงานถูกต้องตามเงื่อนไข! กด [ส่งคำตอบ] เพื่อรับคะแนน XP");
-            } else {
-                this.showValidationBanner(false, "ผลการรันยังไม่ตรงตามเงื่อนไขทั้งหมด ตรวจดูรายการ Checklist ด้านซ้ายนะ");
-            }
+            terminal.innerHTML += `<span style="color: #38bdf8;">${this.escapeHtml(result.output || '(ไม่มีผลลัพธ์การแสดงผล - ลองตรวจสอบคำสั่ง print)')}</span>\n`;
+            this.updateChecklistUI([
+                { id: "c1", passed: code.trim().length > 0 },
+                { id: "c2", passed: (result.output || "").trim().length > 0 },
+                { id: "c3", passed: true }
+            ]);
+            this.showValidationBanner(true, "โค้ดรันได้สำเร็จ ไม่มี Error! หากพอใจกับผลลัพธ์แล้ว กดปุ่ม [ส่งคำตอบ] เพื่อส่งให้คุณครูตรวจ");
         }
         terminal.innerHTML += `<span class="terminal-cursor"></span>`;
         terminal.scrollTop = terminal.scrollHeight;
@@ -230,40 +229,35 @@ class ArenaController {
         window.soundFX.playRun();
 
         const terminal = document.getElementById('terminal-output-area');
-        terminal.innerHTML = `<span class="terminal-prompt">&gt; กำลังตรวจสอบความถูกต้องของภารกิจที่ ${this.currentQuestId} ...</span>\n`;
+        terminal.innerHTML = `<span class="terminal-prompt">&gt; กำลังตรวจสอบและบันทึกผลงานภารกิจที่ ${this.currentQuestId} ...</span>\n`;
 
         const result = await window.questValidator.validateQuest(this.currentQuestId, code);
 
-        if (result.error) {
+        if (!result.success) {
             window.soundFX.playError();
             terminal.innerHTML += `<span class="terminal-error">${this.escapeHtml(result.error)}</span>\n`;
-            this.showValidationBanner(false, "ยังไม่ผ่าน: โค้ดมี Error กรุณาแก้ไขตามคำแนะนำ");
+            this.showValidationBanner(false, "ยังไม่สามารถส่งได้: โค้ดมี Error กรุณาแก้ไขก่อนส่งงาน");
             this.updateChecklistUI(result.checklistResults);
         } else {
             terminal.innerHTML += `<span style="color: #38bdf8;">${this.escapeHtml(result.output)}</span>\n`;
             this.updateChecklistUI(result.checklistResults);
 
-            if (result.success) {
-                window.soundFX.playSuccess();
-                this.triggerConfetti();
+            window.soundFX.playSuccess();
+            this.triggerConfetti();
 
-                const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 20);
-                window.storageManager.recordSubmission(window.storageManager.getStudent(), updatedProgress);
-                this.updateXPBar();
-                this.renderQuestRibbon();
+            const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 25);
+            window.storageManager.recordSubmission(window.storageManager.getStudent(), updatedProgress);
+            this.updateXPBar();
+            this.renderQuestRibbon();
 
-                if (updatedProgress.totalXP >= 100) {
-                    window.soundFX.playLevelUp();
-                    this.showToast("👑 ยินดีด้วย! คุณได้รับฉายา PYTHON GRANDMASTER คะแนนเต็ม 100 XP!");
-                } else {
-                    this.showToast(`🎉 ผ่านภารกิจที่ ${this.currentQuestId} สำเร็จ! ได้รับ +20 XP`);
-                }
-
-                this.showValidationBanner(true, result.feedback, true);
+            if (updatedProgress.completedQuests.length >= 4) {
+                window.soundFX.playLevelUp();
+                this.showToast("🎉 ยอดเยี่ยมมาก! คุณทำครบทั้ง 4 ภารกิจเรียบร้อยแล้ว รอคุณครูตรวจและให้คะแนน");
             } else {
-                window.soundFX.playError();
-                this.showValidationBanner(false, result.feedback);
+                this.showToast(`🎉 บันทึกภารกิจที่ ${this.currentQuestId} เรียบร้อยแล้ว! (+25 XP)`);
             }
+
+            this.showValidationBanner(true, "ส่งคำตอบเรียบร้อยแล้ว! บันทึกโค้ดส่งให้คุณครูตรวจประเมิน", true);
         }
 
         terminal.innerHTML += `<span class="terminal-cursor"></span>`;
@@ -298,7 +292,7 @@ class ArenaController {
 
         if (showNextBtn) {
             nextBtn.style.display = 'inline-flex';
-            nextBtn.querySelector('span').textContent = this.currentQuestId === 5 ? 'ดูสรุปผลภารกิจ 🏆' : 'ลุยข้อต่อไป ▶';
+            nextBtn.querySelector('span').textContent = this.currentQuestId === 4 ? 'ดูสรุปผลภารกิจ 🏆' : 'ลุยข้อต่อไป ▶';
         } else {
             nextBtn.style.display = 'none';
         }
@@ -326,7 +320,7 @@ class ArenaController {
 
         // Banner Next Button
         document.getElementById('btn-banner-next').addEventListener('click', () => {
-            if (this.currentQuestId < 5) {
+            if (this.currentQuestId < 4) {
                 this.loadQuest(this.currentQuestId + 1);
             } else {
                 window.location.href = 'summary.html';
@@ -340,7 +334,7 @@ class ArenaController {
             }
         });
         document.getElementById('btn-next-quest').addEventListener('click', () => {
-            if (this.currentQuestId < 5) {
+            if (this.currentQuestId < 4) {
                 this.loadQuest(this.currentQuestId + 1);
             } else {
                 window.location.href = 'summary.html';
