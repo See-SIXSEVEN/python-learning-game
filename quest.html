@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>สมรภูมิโค้ด | Python Quest: Codédex Edition (ม.3)</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230f172a'/><rect x='4' y='2' width='8' height='3' fill='%23a855f7'/><rect x='3' y='5' width='10' height='7' fill='%2322c55e'/><rect x='5' y='6' width='2' height='2' fill='%23000'/><rect x='9' y='6' width='2' height='2' fill='%23000'/><rect x='7' y='12' width='2' height='3' fill='%23ef4444'/></svg>">
 
@@ -16,7 +19,7 @@
     <link rel="stylesheet" href="vendor/dracula.min.css">
 
     <!-- App Retro Pixel Stylesheet -->
-    <link rel="stylesheet" href="css/retro-pixel.css">
+    <link rel="stylesheet" href="css/retro-pixel.css?v=2.2">
 </head>
 <body>
 
@@ -82,65 +85,37 @@
 
         <!-- Split Screen Arena Layout -->
         <main class="arena-split-container">
-            <!-- Left Side: Quest Card Details -->
+            <!-- Left Side: Quest Card Details (Clean & Focused on Problem) -->
             <div class="quest-card-pane">
                 <div class="quest-top-badges">
-                    <div class="quest-num-badge" id="quest-card-num">ภารกิจที่ 1 / 4</div>
-                    <div class="quest-meta-tags">
-                        <span class="tag-difficulty easy" id="quest-card-difficulty">ง่ายมาก</span>
-                        <span class="tag-xp" id="quest-card-xp">+20 XP</span>
-                    </div>
+                    <div class="quest-num-badge" id="quest-card-num">ข้อที่ 1 / 4</div>
                 </div>
 
-                <h2 class="quest-title" id="quest-card-title">ชื่อภารกิจ</h2>
-
-                <!-- Lore Flavor Story -->
-                <div class="quest-lore-box" id="quest-card-lore">
-                    เนื้อเรื่องประกอบภารกิจ
-                </div>
+                <h2 class="quest-title" id="quest-card-title" style="margin-bottom: 16px;">ข้อที่ 1</h2>
 
                 <!-- Quest Task & Instructions -->
                 <div class="quest-section-title">
-                    <span>📜 คำอธิบายโจทย์ & ภารกิจที่ต้องทำ</span>
+                    <span>📜 คำอธิบายโจทย์</span>
                 </div>
-                <div class="quest-instruction" id="quest-card-instruction">
+                <div class="quest-instruction" id="quest-card-instruction" style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px; padding: 16px; background: rgba(30, 41, 59, 0.6); border-radius: 6px; border-left: 4px solid var(--border-neon);">
                     คำสั่งและรายละเอียดโจทย์
-                </div>
-
-                <!-- Real-time Verification Checklist -->
-                <div class="quest-section-title">
-                    <span>✅ เงื่อนไขที่ต้องทำ (Checklist)</span>
-                </div>
-                <div class="checklist-container" id="quest-checklist-container">
-                    <!-- Populated by JS -->
                 </div>
 
                 <!-- Expected Output Preview -->
                 <div class="quest-section-title">
-                    <span>🎯 ตัวอย่างผลลัพธ์ใน Terminal ที่ต้องการ</span>
+                    <span>🎯 ตัวอย่างผลลัพธ์ใน Terminal</span>
                 </div>
-                <div class="expected-output-box" id="quest-expected-output">
-                    Hello, Python!
-                </div>
-
-                <!-- Hints Accordion -->
-                <div class="hint-accordion">
-                    <div class="hint-header" id="hint-toggle-btn">
-                        <span>💡 ตัวช่วย / คำแนะนำสำหรับภารกิจนี้ (Hints)</span>
-                        <span id="hint-arrow">▼</span>
-                    </div>
-                    <div class="hint-body" id="hint-body-content">
-                        <!-- Populated by JS -->
-                    </div>
+                <div class="expected-output-box" id="quest-expected-output" style="margin-bottom: 24px; font-size: 0.95rem;">
+                    ผลลัพธ์ตัวอย่าง
                 </div>
 
                 <!-- Quest Navigation Footer -->
                 <div class="quest-nav-footer">
                     <button type="button" class="pixel-btn pixel-btn-dark" id="btn-prev-quest">
-                        <span>◀ ภารกิจก่อนหน้า</span>
+                        <span>◀ ข้อก่อนหน้า</span>
                     </button>
                     <button type="button" class="pixel-btn pixel-btn-dark" id="btn-next-quest">
-                        <span>ภารกิจถัดไป ▶</span>
+                        <span>ข้อถัดไป ▶</span>
                     </button>
                 </div>
             </div>
@@ -292,12 +267,12 @@ total = num1 + num2 # ตัวแปรสามารถนำมาคำน�
     <script src="vendor/skulpt-stdlib.js"></script>
     <script src="vendor/confetti.min.js"></script>
 
-    <!-- App Business Logic -->
-    <script src="js/audio.js"></script>
-    <script src="js/quests.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/validator.js"></script>
-    <script src="js/arena.js"></script>
+    <!-- App Business Logic (with Cache Busting) -->
+    <script src="js/audio.js?v=2.2"></script>
+    <script src="js/quests.js?v=2.2"></script>
+    <script src="js/storage.js?v=2.2"></script>
+    <script src="js/validator.js?v=2.2"></script>
+    <script src="js/arena.js?v=2.2"></script>
 </body>
 </html>
 

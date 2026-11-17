@@ -7,7 +7,20 @@ class StorageManager {
         this.LEADERBOARD_KEY = 'pyquest_class_leaderboard';
         this.SUBMISSIONS_KEY = 'pyquest_all_submissions';
         this.SHEETS_URL_KEY = 'pyquest_sheets_url';
+        this.DATA_VERSION_KEY = 'pyquest_data_version';
+
+        this.checkDataVersion();
         this.initDefaultLeaderboard();
+    }
+
+    // Auto-clean old mock/stale data on version change
+    checkDataVersion() {
+        const CURRENT_VERSION = 'v2_4quests';
+        const savedVersion = localStorage.getItem(this.DATA_VERSION_KEY);
+        if (savedVersion !== CURRENT_VERSION) {
+            this.purgeMockData();
+            localStorage.setItem(this.DATA_VERSION_KEY, CURRENT_VERSION);
+        }
     }
 
     isMockEnabled() {
@@ -197,29 +210,26 @@ class StorageManager {
         }
     }
 
-    // Generate Combined Leaderboard including Current Student
+    // Generate Combined Leaderboard including Current Student (Real Submissions Only)
     getCombinedLeaderboard() {
         const student = this.getStudent();
-        const progress = this.getProgress();
-        // Only use stored peers (mock peers only appear if mock mode was ON during initDefaultLeaderboard)
-        const peers = JSON.parse(localStorage.getItem(this.LEADERBOARD_KEY)) || [];
+        const submissions = this.getAllSubmissions();
 
-        let list = [...peers];
+        let list = [];
 
-        if (student) {
-            const rank = this.getRankInfo(progress.totalXP);
-            const myEntry = {
-                name: student.name + " (คุณ)",
-                grade: student.grade,
-                no: student.no,
-                xp: progress.totalXP,
-                badge: `${rank.badgeIcon} ${rank.title.split(' ')[0]}`,
-                avatar: student.avatar || "👾",
-                time: progress.finishTime ? "เสร็จสิ้นภารกิจ" : "กำลังทำภารกิจ",
-                isCurrentStudent: true
-            };
-            list.push(myEntry);
-        }
+        submissions.forEach(sub => {
+            const isMe = student && sub.name === student.name && sub.grade === student.grade;
+            list.push({
+                name: isMe ? `${sub.name} (คุณ)` : sub.name,
+                grade: sub.grade,
+                no: sub.no,
+                xp: (sub.grading && sub.grading.isGraded) ? sub.grading.totalScore : sub.xp,
+                badge: sub.badge,
+                avatar: sub.avatar || '⚡',
+                time: sub.updatedAt || 'กำลังทำภารกิจ',
+                isCurrentStudent: isMe
+            });
+        });
 
         // Sort descending by XP, then by student number
         list.sort((a, b) => {
@@ -302,34 +312,15 @@ class StorageManager {
         const raw = localStorage.getItem(this.SUBMISSIONS_KEY);
         let list = raw ? JSON.parse(raw) : [];
 
+        // Filter out any stale mock peer entries
+        list = list.filter(item => !String(item.id).startsWith('peer_'));
+
         // If list is empty, also include current student if registered
         const currentStudent = this.getStudent();
         if (currentStudent && !list.some(s => s.name === currentStudent.name && s.grade === currentStudent.grade)) {
             const prog = this.getProgress();
             this.recordSubmission(currentStudent, prog);
             return this.getAllSubmissions();
-        }
-
-        // Include default mock peers ONLY if mock mode is enabled and list has very few items
-        if (list.length <= 1 && this.isMockEnabled()) {
-            const peers = this.getDefaultPeers();
-            peers.forEach((p, idx) => {
-                list.push({
-                    id: `peer_${idx}`,
-                    name: p.name,
-                    grade: p.grade,
-                    no: p.no,
-                    avatar: p.avatar,
-                    xp: p.xp,
-                    badge: p.badge,
-                    thaiBadge: "คะแนนจากระบบ",
-                    completedQuests: [1, 2, 3, 4].slice(0, Math.floor(p.xp / 25)),
-                    questScores: {},
-                    questCodes: { 1: 'print("Hello, Python!")' },
-                    updatedAt: "ส่งแล้ว",
-                    timestamp: Date.now() - (idx * 60000)
-                });
-            });
         }
 
         return list;

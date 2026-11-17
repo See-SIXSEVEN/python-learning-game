@@ -138,42 +138,18 @@ class ArenaController {
         progress.currentQuestId = questId;
         window.storageManager.saveProgress(progress);
 
-        // Update Quest Info
-        document.getElementById('quest-card-num').textContent = `ภารกิจที่ ${quest.id} / 4 • ${quest.category}`;
-        const diffBadge = document.getElementById('quest-card-difficulty');
-        diffBadge.textContent = quest.difficulty;
-        diffBadge.className = `tag-difficulty ${quest.difficultyClass}`;
+        // Update Quest Info (Clean & Simple)
+        const numBadge = document.getElementById('quest-card-num');
+        if (numBadge) numBadge.textContent = `ข้อที่ ${quest.id} / 4`;
 
-        document.getElementById('quest-card-xp').textContent = `+${quest.xp} XP`;
-        document.getElementById('quest-card-title').textContent = quest.title;
-        document.getElementById('quest-card-lore').textContent = `"${quest.lore}"`;
-        document.getElementById('quest-card-instruction').innerHTML = quest.instruction;
-        document.getElementById('quest-expected-output').textContent = quest.sampleOutput;
+        const titleEl = document.getElementById('quest-card-title');
+        if (titleEl) titleEl.textContent = quest.title;
 
-        // Render Checklist
-        const checkContainer = document.getElementById('quest-checklist-container');
-        checkContainer.innerHTML = '';
-        quest.checklist.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'checklist-item';
-            row.id = `check-${item.id}`;
-            row.innerHTML = `
-                <span class="checklist-icon">⬜</span>
-                <span>${item.text}</span>
-            `;
-            checkContainer.appendChild(row);
-        });
+        const instructionEl = document.getElementById('quest-card-instruction');
+        if (instructionEl) instructionEl.innerHTML = quest.instruction;
 
-        // Render Hints
-        const hintBody = document.getElementById('hint-body-content');
-        let hintHtml = '<ul>';
-        quest.hints.forEach(h => {
-            hintHtml += `<li>${h}</li>`;
-        });
-        hintHtml += '</ul>';
-        hintBody.innerHTML = hintHtml;
-        hintBody.classList.remove('open');
-        document.getElementById('hint-arrow').textContent = '▼';
+        const outputEl = document.getElementById('quest-expected-output');
+        if (outputEl) outputEl.textContent = quest.sampleOutput;
 
         // Load Code into Editor
         const savedCode = window.storageManager.getQuestCode(questId);
@@ -185,7 +161,7 @@ class ArenaController {
         // Reset Terminal & Banner
         this.hideValidationBanner();
         const terminal = document.getElementById('terminal-output-area');
-        terminal.innerHTML = `<span class="terminal-prompt">&gt; เข้าสู่ภารกิจที่ ${quest.id}: ${quest.title}</span>\n<span class="terminal-prompt">&gt; แก้ไขโค้ดใน main.py แล้วกด [รันโค้ด] หรือ [ส่งคำตอบ]</span>\n<span class="terminal-cursor"></span>`;
+        terminal.innerHTML = `<span class="terminal-prompt">&gt; ข้อที่ ${quest.id}: ${quest.title}</span>\n<span class="terminal-prompt">&gt; เขียนโค้ดในหน้าต่างด้านบน แล้วกด [▶ รันโค้ด] เพื่อทดสอบ หรือ [🚀 ส่งคำตอบ]</span>\n<span class="terminal-cursor"></span>`;
 
         this.renderQuestRibbon();
 
@@ -193,7 +169,7 @@ class ArenaController {
         const btnNext = document.getElementById('btn-next-quest');
         if (btnPrev) btnPrev.disabled = questId === 1;
         if (btnNext) {
-            btnNext.innerHTML = questId === 4 ? '<span>สรุปผลภารกิจ 🏆</span>' : '<span>ภารกิจถัดไป ▶</span>';
+            btnNext.innerHTML = questId === 4 ? '<span>ดูสรุปผล 🏆</span>' : '<span>ข้อถัดไป ▶</span>';
         }
     }
 
@@ -203,21 +179,14 @@ class ArenaController {
         window.soundFX.playRun();
 
         const terminal = document.getElementById('terminal-output-area');
-        terminal.innerHTML = `<span class="terminal-prompt">&gt; python3 main.py ... กำลังรันโค้ด</span>\n`;
+        terminal.innerHTML = `<span class="terminal-prompt">&gt; python3 main.py ... รันโค้ด</span>\n`;
 
         const result = await window.questValidator.runCode(code);
 
         if (!result.success) {
             terminal.innerHTML += `<span class="terminal-error">${this.escapeHtml(result.error)}</span>\n`;
-            this.showValidationBanner(false, "เกิดข้อผิดพลาดในการรันโค้ด ตรวจสอบรายละเอียดและแก้ไขใน Terminal ด้านล่าง");
         } else {
-            terminal.innerHTML += `<span style="color: #38bdf8;">${this.escapeHtml(result.output || '(ไม่มีผลลัพธ์การแสดงผล - ลองตรวจสอบคำสั่ง print)')}</span>\n`;
-            this.updateChecklistUI([
-                { id: "c1", passed: code.trim().length > 0 },
-                { id: "c2", passed: (result.output || "").trim().length > 0 },
-                { id: "c3", passed: true }
-            ]);
-            this.showValidationBanner(true, "โค้ดรันได้สำเร็จ ไม่มี Error! หากพอใจกับผลลัพธ์แล้ว กดปุ่ม [ส่งคำตอบ] เพื่อส่งให้คุณครูตรวจ");
+            terminal.innerHTML += `<span style="color: #38bdf8;">${this.escapeHtml(result.output || '(ไม่มีผลลัพธ์การแสดงผล - อย่าลืมใช้คำสั่ง print)')}</span>\n`;
         }
         terminal.innerHTML += `<span class="terminal-cursor"></span>`;
         terminal.scrollTop = terminal.scrollHeight;
@@ -226,42 +195,45 @@ class ArenaController {
     async handleSubmitCode() {
         if (!this.editor) return;
         const code = this.editor.getValue();
-        window.soundFX.playRun();
 
-        const terminal = document.getElementById('terminal-output-area');
-        terminal.innerHTML = `<span class="terminal-prompt">&gt; กำลังตรวจสอบและบันทึกผลงานภารกิจที่ ${this.currentQuestId} ...</span>\n`;
-
-        const result = await window.questValidator.validateQuest(this.currentQuestId, code);
-
-        if (!result.success) {
-            window.soundFX.playError();
-            terminal.innerHTML += `<span class="terminal-error">${this.escapeHtml(result.error)}</span>\n`;
-            this.showValidationBanner(false, "ยังไม่สามารถส่งได้: โค้ดมี Error กรุณาแก้ไขก่อนส่งงาน");
-            this.updateChecklistUI(result.checklistResults);
-        } else {
-            terminal.innerHTML += `<span style="color: #38bdf8;">${this.escapeHtml(result.output)}</span>\n`;
-            this.updateChecklistUI(result.checklistResults);
-
-            window.soundFX.playSuccess();
-            this.triggerConfetti();
-
-            const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 25);
-            window.storageManager.recordSubmission(window.storageManager.getStudent(), updatedProgress);
-            this.updateXPBar();
-            this.renderQuestRibbon();
-
-            if (updatedProgress.completedQuests.length >= 4) {
-                window.soundFX.playLevelUp();
-                this.showToast("🎉 ยอดเยี่ยมมาก! คุณทำครบทั้ง 4 ภารกิจเรียบร้อยแล้ว รอคุณครูตรวจและให้คะแนน");
-            } else {
-                this.showToast(`🎉 บันทึกภารกิจที่ ${this.currentQuestId} เรียบร้อยแล้ว! (+25 XP)`);
-            }
-
-            this.showValidationBanner(true, "ส่งคำตอบเรียบร้อยแล้ว! บันทึกโค้ดส่งให้คุณครูตรวจประเมิน", true);
+        if (!code || !code.trim()) {
+            alert("⚠️ ยังไม่ได้เขียนโค้ดในข้อนี้ กรุณาเขียนโค้ดก่อนกดส่งนะ");
+            return;
         }
 
-        terminal.innerHTML += `<span class="terminal-cursor"></span>`;
-        terminal.scrollTop = terminal.scrollHeight;
+        // Test run in background to see if there's error to inform the student
+        const result = await window.questValidator.runCode(code);
+        let confirmMsg = `คุณต้องการบันทึกและส่งโค้ดข้อที่ ${this.currentQuestId} ให้คุณครูตรวจใช่หรือไม่?`;
+        if (!result.success) {
+            confirmMsg = `⚠️ โค้ดข้อนี้ยังรันแล้วมี Error อยู่:\n"${result.error.split('\n')[0]}"\n\nคุณยังคงต้องการยืนยันที่จะส่งโค้ดนี้ให้คุณครูตรวจใช่หรือไม่?`;
+        }
+
+        this.openConfirmModal(
+            `🚀 ยืนยันส่งคำตอบ ข้อที่ ${this.currentQuestId}`,
+            confirmMsg,
+            () => {
+                this.executeSubmit(code);
+            }
+        );
+    }
+
+    executeSubmit(code) {
+        window.soundFX.playSuccess();
+        this.triggerConfetti();
+
+        const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 25);
+        window.storageManager.recordSubmission(window.storageManager.getStudent(), updatedProgress);
+        this.updateXPBar();
+        this.renderQuestRibbon();
+
+        this.showToast(`✅ บันทึกส่งคำตอบข้อที่ ${this.currentQuestId} เรียบร้อยแล้ว!`);
+        this.showValidationBanner(true, `ส่งคำตอบข้อที่ ${this.currentQuestId} เรียบร้อยแล้ว! ครูจะทำการตรวจประเมิน`, true);
+
+        const terminal = document.getElementById('terminal-output-area');
+        if (terminal) {
+            terminal.innerHTML += `\n<span style="color: #4ade80;">&gt; [ระบบ]: ส่งโค้ดข้อที่ ${this.currentQuestId} ถึงคุณครูเรียบร้อยแล้ว</span>\n`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
     }
 
     updateChecklistUI(checklistResults) {
