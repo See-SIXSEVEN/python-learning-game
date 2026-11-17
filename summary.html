@@ -14,6 +14,15 @@
     <!-- App Retro Pixel Stylesheet & Print Stylesheet -->
     <link rel="stylesheet" href="css/retro-pixel.css?v=2.2">
     <link rel="stylesheet" href="css/print.css?v=2.2">
+    <!-- Strict Route Guard: Kick unauthenticated students back to index.html immediately -->
+    <script>
+        (function() {
+            var student = localStorage.getItem('pyquest_student_profile');
+            if (!student) {
+                window.location.replace('index.html');
+            }
+        })();
+    </script>
 </head>
 <body>
 
@@ -60,60 +69,43 @@
             <!-- Score Cards -->
             <div class="summary-score-grid">
                 <div class="score-box">
-                    <div class="score-box-num" id="summary-score-xp">100</div>
-                    <div class="score-box-label">คะแนน XP รวม (เต็ม 100)</div>
+                    <div class="score-box-num" id="summary-score-quests">0 / 4</div>
+                    <div class="score-box-label">ภารกิจที่ส่งคำตอบ</div>
                 </div>
                 <div class="score-box">
-                    <div class="score-box-num" id="summary-score-quests">4 / 4</div>
-                    <div class="score-box-label">ภารกิจที่ผ่านสำเร็จ</div>
+                    <div class="score-box-num" id="summary-grading-status" style="font-size: 1.1rem; color: var(--text-yellow);">⏳ รอครูตรวจ</div>
+                    <div class="score-box-label">สถานะการตรวจประเมิน</div>
                 </div>
                 <div class="score-box">
-                    <div class="score-box-num" id="summary-score-rank">#1</div>
-                    <div class="score-box-label">อันดับในชั้นเรียน</div>
+                    <div class="score-box-num" id="summary-score-xp" style="color: var(--text-green);">-</div>
+                    <div class="score-box-label">คะแนนที่ครูประเมินให้ (100)</div>
                 </div>
             </div>
         </div>
 
-        <!-- Class Leaderboard Section -->
-        <div class="leaderboard-card">
-            <h2 class="leaderboard-title">
-                <span>🏆 ตารางจัดอันดับการแข่งขันในชั้นเรียน (Leaderboard)</span>
+        <!-- Teacher Feedback Card (ข้อเสนอแนะจากคุณครู) -->
+        <div class="leaderboard-card" style="border-left: 5px solid var(--border-neon); margin-bottom: 24px;">
+            <h2 class="leaderboard-title" style="color: var(--text-yellow); margin-bottom: 10px;">
+                <span>💬 ผลการตรวจและข้อเสนอแนะจากครูผู้สอน</span>
             </h2>
-            <div style="overflow-x: auto;">
-                <table class="leaderboard-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 70px;">อันดับ</th>
-                            <th>นักเรียน</th>
-                            <th>ห้อง</th>
-                            <th>เลขที่</th>
-                            <th>ฉายา</th>
-                            <th>สถานะ</th>
-                            <th style="text-align: right;">คะแนน XP</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboard-tbody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+            <div id="summary-teacher-feedback-box" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: 6px; padding: 16px; font-size: 1rem; line-height: 1.7; color: var(--text-main);">
+                <span style="color: var(--text-muted);">⏳ คุณครูยังไม่ได้ตรวจประเมินข้อสอบชุดนี้ เมื่อครูตรวจแล้ว คะแนนและคำแนะนำจะแสดงที่นี่</span>
             </div>
         </div>
 
-        <!-- 5 Quests Score & Rubric Review Table -->
+        <!-- 4 Quests Review Table -->
         <div class="review-table-card">
             <h2 class="leaderboard-title" style="color: var(--text-cyan);">
-                <span>📋 รายงานผลการประเมินแยกตามรายข้อ (4 ภารกิจ)</span>
+                <span>📋 รายงานสถานะการส่งงานรายข้อ (4 ภารกิจ)</span>
             </h2>
             <div style="overflow-x: auto;">
                 <table class="leaderboard-table">
                     <thead>
                         <tr>
                             <th style="width: 60px;">ข้อที่</th>
-                            <th>สาระการเรียนรู้ / หัวข้อ</th>
-                            <th>ระดับ</th>
-                            <th>คะแนนเต็ม</th>
-                            <th>คะแนนที่ได้</th>
-                            <th style="text-align: center;">สถานะ</th>
+                            <th>รายละเอียดโจทย์</th>
+                            <th style="text-align: center; width: 120px;">สถานะการส่ง</th>
+                            <th style="text-align: center; width: 140px;">คะแนนที่ได้</th>
                         </tr>
                     </thead>
                     <tbody id="quests-review-tbody">

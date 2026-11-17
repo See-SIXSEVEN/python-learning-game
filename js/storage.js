@@ -326,6 +326,26 @@ class StorageManager {
         return list;
     }
 
+    // Delete student record by ID
+    deleteStudent(studentId) {
+        const raw = localStorage.getItem(this.SUBMISSIONS_KEY);
+        if (raw) {
+            let list = JSON.parse(raw);
+            list = list.filter(item => item.id !== studentId);
+            localStorage.setItem(this.SUBMISSIONS_KEY, JSON.stringify(list));
+        }
+
+        // If deleted student is the current logged in student, clear profile
+        const currentStudent = this.getStudent();
+        if (currentStudent) {
+            const currentKey = `${currentStudent.name}_${currentStudent.grade}_${currentStudent.no}`;
+            if (currentKey === studentId) {
+                localStorage.removeItem(this.STUDENT_KEY);
+                localStorage.removeItem(this.PROGRESS_KEY);
+            }
+        }
+    }
+
     clearAllSubmissions() {
         localStorage.removeItem(this.SUBMISSIONS_KEY);
     }

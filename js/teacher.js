@@ -309,9 +309,14 @@ class TeacherDashboard {
                 <td><span style="color: var(--text-yellow); font-family: var(--font-pixel); font-size: 0.72rem;">${student.badge || '-'}</span></td>
                 <td style="color: var(--text-muted); font-size: 0.8rem;">${student.updatedAt || '-'}</td>
                 <td style="text-align: center;">
-                    <button type="button" class="tool-btn inspect-btn" data-id="${student.id}" style="color: var(--text-cyan); border-color: var(--border-neon); padding: 5px 10px; cursor: pointer;" title="คลิกเพื่อดูโค้ดและตรวจให้คะแนน">
-                        📝 ตรวจโค้ด
-                    </button>
+                    <div style="display: flex; justify-content: center; gap: 6px;">
+                        <button type="button" class="tool-btn inspect-btn" data-id="${student.id}" style="color: var(--text-cyan); border-color: var(--border-neon); padding: 5px 8px; cursor: pointer;" title="คลิกเพื่อดูโค้ดและตรวจให้คะแนน">
+                            📝 ตรวจ
+                        </button>
+                        <button type="button" class="tool-btn delete-student-btn" data-id="${student.id}" data-name="${this.escapeHtml(student.name)}" style="color: var(--text-red); border-color: var(--border-red); padding: 5px 8px; cursor: pointer;" title="ลบนักเรียนคนนี้ออกจากระบบ">
+                            🗑️ ลบ
+                        </button>
+                    </div>
                 </td>
             `;
 
@@ -325,6 +330,21 @@ class TeacherDashboard {
                 const targetStudent = this.allStudents.find(s => s.id === id);
                 if (targetStudent) {
                     this.openInspectModal(targetStudent);
+                }
+            });
+        });
+
+        // Bind delete student buttons
+        tbody.querySelectorAll('.delete-student-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const name = btn.getAttribute('data-name');
+                if (confirm(`⚠️ ยืนยันการลบนักเรียน:\n\nคุณต้องการลบข้อมูลของ "${name}" ออกจากระบบใช่หรือไม่?\n(ข้อมูลคะแนนและโค้ดของนักเรียนคนนี้จะถูกลบถาวร)`)) {
+                    window.storageManager.deleteStudent(id);
+                    window.soundFX.playClick();
+                    alert(`ลบข้อมูลของ ${name} เรียบร้อยแล้ว`);
+                    this.loadData();
+                    this.renderTable();
                 }
             });
         });

@@ -20,6 +20,15 @@
 
     <!-- App Retro Pixel Stylesheet -->
     <link rel="stylesheet" href="css/retro-pixel.css?v=2.2">
+    <!-- Strict Route Guard: Kick unauthenticated students back to index.html immediately -->
+    <script>
+        (function() {
+            var student = localStorage.getItem('pyquest_student_profile');
+            if (!student) {
+                window.location.replace('index.html');
+            }
+        })();
+    </script>
 </head>
 <body>
 
@@ -91,14 +100,14 @@
                     <div class="quest-num-badge" id="quest-card-num">ข้อที่ 1 / 4</div>
                 </div>
 
-                <h2 class="quest-title" id="quest-card-title" style="margin-bottom: 16px;">ข้อที่ 1</h2>
+                <h2 class="quest-title" id="quest-card-title" style="margin-bottom: 16px;">ข้อที่ 1 (3 คะแนน)</h2>
 
                 <!-- Quest Task & Instructions -->
                 <div class="quest-section-title">
                     <span>📜 คำอธิบายโจทย์</span>
                 </div>
                 <div class="quest-instruction" id="quest-card-instruction" style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px; padding: 16px; background: rgba(30, 41, 59, 0.6); border-radius: 6px; border-left: 4px solid var(--border-neon);">
-                    คำสั่งและรายละเอียดโจทย์
+                    กำหนดตัวแปรชื่อและชื่อเล่น แล้วแสดงข้อความแนะนำตัว เช่น "สวัสดี ฉันชื่อ สมหญิง ชื่อเล่น หญิง"
                 </div>
 
                 <!-- Expected Output Preview -->
@@ -106,7 +115,7 @@
                     <span>🎯 ตัวอย่างผลลัพธ์ใน Terminal</span>
                 </div>
                 <div class="expected-output-box" id="quest-expected-output" style="margin-bottom: 24px; font-size: 0.95rem;">
-                    ผลลัพธ์ตัวอย่าง
+                    สวัสดี ฉันชื่อ สมหญิง ชื่อเล่น หญิง
                 </div>
 
                 <!-- Quest Navigation Footer -->

@@ -65,6 +65,11 @@ class ArenaController {
         // Load progress & header
         const progress = window.storageManager.getProgress();
         this.currentQuestId = progress.currentQuestId || 1;
+        if (this.currentQuestId < 1 || this.currentQuestId > 4) {
+            this.currentQuestId = 1;
+            progress.currentQuestId = 1;
+            window.storageManager.saveProgress(progress);
+        }
 
         this.renderHeader();
         this.renderQuestRibbon();
@@ -128,8 +133,11 @@ class ArenaController {
     }
 
     loadQuest(questId) {
-        const quest = window.QUESTS.find(q => q.id === questId);
-        if (!quest) return;
+        let quest = window.QUESTS.find(q => q.id === questId);
+        if (!quest) {
+            quest = window.QUESTS[0];
+            questId = 1;
+        }
 
         this.currentQuestId = questId;
 

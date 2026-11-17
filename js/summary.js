@@ -9,17 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const student = window.storageManager.getStudent();
     const progress = window.storageManager.getProgress();
-    const totalXP = progress.totalXP || 0;
-    const rank = window.storageManager.getRankInfo(totalXP);
+    const studentKey = `${student.name}_${student.grade}_${student.no}`;
+
+    // Find student submission with teacher grading
+    const allSubs = window.storageManager.getAllSubmissions();
+    const mySub = allSubs.find(s => s.id === studentKey || (s.name === student.name && s.grade === student.grade && s.no === student.no)) || {};
+    const grading = mySub.grading || null;
+    const isGraded = grading && grading.isGraded;
 
     // Trigger celebration sound & confetti
     setTimeout(() => {
-        if (totalXP >= 80) {
-            window.soundFX.playLevelUp();
-        } else {
-            window.soundFX.playSuccess();
-        }
-
+        window.soundFX.playSuccess();
         if (typeof confetti === 'function') {
             confetti({
                 particleCount: 100,
@@ -29,62 +29,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 200);
 
-    // Render Hero Stamp & Scores
-    document.getElementById('summary-stamp-title').textContent = `${rank.badgeIcon} ${rank.title.toUpperCase()}`;
-    document.getElementById('summary-stamp-thai').textContent = rank.thaiTitle;
-    document.getElementById('summary-score-xp').textContent = `${totalXP} / 100`;
-    document.getElementById('summary-score-quests').textContent = `${progress.completedQuests.length} / 4`;
+    // Render Hero Stamp & Header Info
+    const rank = window.storageManager.getRankInfo(isGraded ? grading.totalScore : (progress.totalXP || 0));
+    document.getElementById('summary-stamp-title').textContent = isGraded ? `👑 คะแนนที่ได้: ${grading.totalScore} / 100` : `📝 ส่งคำตอบเรียบร้อยแล้ว`;
+    document.getElementById('summary-stamp-thai').textContent = `${student.name} (${student.grade} เลขที่ ${student.no})`;
 
-    // Render Leaderboard
-    const leaderboard = window.storageManager.getCombinedLeaderboard();
-    const tbody = document.getElementById('leaderboard-tbody');
-    tbody.innerHTML = '';
+    // Score Grid
+    const completedCount = (progress.completedQuests || []).length;
+    document.getElementById('summary-score-quests').textContent = `${completedCount} / 4 ข้อ`;
 
-    let myRankNumber = 1;
-    leaderboard.forEach((entry, idx) => {
-        const rankNum = idx + 1;
-        if (entry.isCurrentStudent) {
-            myRankNumber = rankNum;
+    const statusEl = document.getElementById('summary-grading-status');
+    const scoreXpEl = document.getElementById('summary-score-xp');
+    const feedbackBox = document.getElementById('summary-teacher-feedback-box');
+
+    if (isGraded) {
+        statusEl.textContent = '✅ ตรวจแล้ว';
+        statusEl.style.color = '#4ade80';
+        scoreXpEl.textContent = `${grading.totalScore}`;
+
+        if (grading.feedback && grading.feedback.trim()) {
+            feedbackBox.innerHTML = `
+                <div style="font-weight: 600; color: #facc15; margin-bottom: 6px;">📢 คำแนะนำจากคุณครู:</div>
+                <div style="font-size: 1.05rem; color: #f8fafc; white-space: pre-wrap;">"${escapeHtml(grading.feedback)}"</div>
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 8px;">ตรวจเมื่อ: ${grading.gradedAt || '-'}</div>
+            `;
+        } else {
+            feedbackBox.innerHTML = `
+                <span style="color: #4ade80;">✔ คุณครูตรวจประเมินเรียบร้อยแล้ว ได้คะแนนรวม <strong>${grading.totalScore}</strong> / 100 คะแนน</span>
+            `;
         }
+    } else {
+        statusEl.textContent = '⏳ รอครูตรวจ';
+        statusEl.style.color = '#facc15';
+        scoreXpEl.textContent = 'รอตรวจ';
 
-        const tr = document.createElement('tr');
-        tr.className = `leaderboard-row ${entry.isCurrentStudent ? 'current-user' : ''}`;
-
-        let medal = `#${rankNum}`;
-        if (rankNum === 1) medal = `<span class="rank-badge rank-1">🥇 #1</span>`;
-        else if (rankNum === 2) medal = `<span class="rank-badge rank-2">🥈 #2</span>`;
-        else if (rankNum === 3) medal = `<span class="rank-badge rank-3">🥉 #3</span>`;
-
-        tr.innerHTML = `
-            <td>${medal}</td>
-            <td><span style="font-size: 1.2rem; margin-right: 6px;">${entry.avatar || '⚡'}</span> ${entry.name}</td>
-            <td>${entry.grade}</td>
-            <td>${entry.no}</td>
-            <td><span style="color: var(--text-yellow); font-family: var(--font-pixel); font-size: 0.75rem;">${entry.badge}</span></td>
-            <td><span style="color: var(--text-muted); font-size: 0.85rem;">${entry.time}</span></td>
-            <td style="text-align: right; font-family: var(--font-pixel); color: var(--text-cyan);">${entry.xp} XP</td>
+        feedbackBox.innerHTML = `
+            <span style="color: #94a3b8;">⏳ คุณครูยังไม่ได้ตรวจประเมินผลงานของคุณ เมื่อคุณครูตรวจแล้ว คะแนนรายข้อและคำแนะนำจะแสดงที่นี่</span>
         `;
-        tbody.appendChild(tr);
-    });
+    }
 
-    document.getElementById('summary-score-rank').textContent = `#${myRankNumber}`;
-
-    // Render 4 Quests Rubric Review
+    // Render 4 Quests Review Table
     const reviewTbody = document.getElementById('quests-review-tbody');
     reviewTbody.innerHTML = '';
 
     window.QUESTS.forEach(q => {
-        const isPassed = progress.completedQuests.includes(q.id);
-        const tr = document.createElement('tr');
+        const isPassed = (progress.completedQuests || []).includes(q.id);
+        const questScore = (isGraded && grading.scores && grading.scores[q.id] !== undefined)
+            ? `${grading.scores[q.id]} / 25`
+            : (isPassed ? '<span style="color: #facc15;">รอตรวจ</span>' : '<span style="color: #64748b;">-</span>');
 
+        const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="font-family: var(--font-pixel); text-align: center;">${q.id}</td>
-            <td><strong>${q.category}</strong> ${q.title}</td>
-            <td><span class="tag-difficulty ${q.difficultyClass}">${q.difficulty}</span></td>
-            <td>25 XP</td>
-            <td style="font-family: var(--font-pixel); color: ${isPassed ? 'var(--text-green)' : 'var(--text-muted)'};">${isPassed ? '25' : '0'} XP</td>
+            <td><strong>${q.title}</strong>: ${escapeHtml(q.instruction)}</td>
             <td style="text-align: center;">
                 ${isPassed ? '<span style="color: var(--text-green); font-weight: bold;">✅ ส่งแล้ว</span>' : '<span style="color: var(--text-muted);">⬜ ยังไม่ส่ง</span>'}
+            </td>
+            <td style="text-align: center; font-weight: 600; font-family: var(--font-pixel); font-size: 0.85rem;">
+                ${questScore}
             </td>
         `;
         reviewTbody.appendChild(tr);
@@ -171,5 +173,15 @@ function prepareAndPrintReport(student, progress, totalXP, rank) {
 
     window.soundFX.playClick();
     window.print();
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
