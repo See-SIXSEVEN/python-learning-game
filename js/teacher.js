@@ -236,9 +236,8 @@ class TeacherDashboard {
                                 grade: s.grade || '-',
                                 no: s.no || '-',
                                 xp: gradingScore,
-                                badge: (s.grading && s.grading.isGraded) ? `✅ ${gradingScore}/100` : (s.badge || '-'),
                                 completedQuests: `${passedCount} / 4 ภารกิจ`,
-                                gradingStatus: gradingStatus,
+                                status: gradingStatus,
                                 feedback: (s.grading && s.grading.feedback) || '-',
                                 timestamp: s.updatedAt || new Date().toISOString()
                             })
