@@ -232,6 +232,17 @@ class TeacherDashboard {
         if (btnLogout) btnLogout.style.display = 'inline-flex';
         this.loadData();
         this.renderTable();
+
+        // Live Realtime listener from Firebase Cloud
+        if (window.firebaseService) {
+            window.firebaseService.listenToAllSubmissions((cloudList) => {
+                if (cloudList && Array.isArray(cloudList)) {
+                    this.allStudents = cloudList;
+                    this.renderTable();
+                    console.log("Teacher dashboard updated in realtime from Firebase Cloud ⚡");
+                }
+            });
+        }
     }
 
     loadData() {

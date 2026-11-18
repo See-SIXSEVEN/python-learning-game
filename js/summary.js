@@ -92,6 +92,27 @@ document.addEventListener('DOMContentLoaded', () => {
         reviewTbody.appendChild(tr);
     });
 
+    // Listen to Realtime Grading updates for this student from Firebase
+    if (window.firebaseService && window.firebaseService.isReady) {
+        const safeK = window.firebaseService.safeKey(`${student.grade}_${student.no}_${student.name}`);
+        window.firebaseService.db.ref(`submissions/${safeK}`).on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.grading && data.grading.isGraded) {
+                // Update UI in Realtime
+                statusEl.textContent = '✅ ตรวจแล้ว';
+                statusEl.style.color = '#4ade80';
+                scoreXpEl.textContent = `${data.grading.totalScore}`;
+                if (data.grading.feedback) {
+                    feedbackBox.innerHTML = `
+                        <div style="font-weight: 600; color: #facc15; margin-bottom: 6px;">📢 คำแนะนำจากคุณครู:</div>
+                        <div style="font-size: 1.05rem; color: #f8fafc; white-space: pre-wrap;">"${escapeHtml(data.grading.feedback)}"</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 8px;">ตรวจเมื่อ: ${data.grading.gradedAt || '-'}</div>
+                    `;
+                }
+            }
+        });
+    }
+
     // Top Navigation Buttons
     document.getElementById('btn-top-back-arena').addEventListener('click', () => {
         window.location.href = 'quest.html';

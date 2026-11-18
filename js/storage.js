@@ -278,6 +278,11 @@ class StorageManager {
 
         localStorage.setItem(this.SUBMISSIONS_KEY, JSON.stringify(list));
 
+        // Sync with Firebase Cloud Realtime
+        if (window.firebaseService) {
+            window.firebaseService.saveSubmission(student, progress, record.grading);
+        }
+
         // Sync with Google Sheets in background if configured
         this.sendToGoogleSheets(student, progress, record);
     }
@@ -294,7 +299,7 @@ class StorageManager {
                 total += Number(scores[qId] || 0);
             }
 
-            list[idx].grading = {
+            const gradingObj = {
                 scores: scores,
                 totalScore: total,
                 feedback: feedback || "",
@@ -302,7 +307,14 @@ class StorageManager {
                 isGraded: true
             };
 
+            list[idx].grading = gradingObj;
             localStorage.setItem(this.SUBMISSIONS_KEY, JSON.stringify(list));
+
+            // Sync grading to Firebase Cloud
+            if (window.firebaseService) {
+                window.firebaseService.saveGrading(studentId, gradingObj);
+            }
+
             return list[idx];
         }
         return null;
@@ -333,6 +345,11 @@ class StorageManager {
             let list = JSON.parse(raw);
             list = list.filter(item => item.id !== studentId);
             localStorage.setItem(this.SUBMISSIONS_KEY, JSON.stringify(list));
+        }
+
+        // Delete from Firebase Cloud
+        if (window.firebaseService) {
+            window.firebaseService.deleteStudent(studentId);
         }
 
         // If deleted student is the current logged in student, clear profile

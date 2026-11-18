@@ -74,6 +74,17 @@ class ArenaController {
         this.renderHeader();
         this.renderQuestRibbon();
         this.loadQuest(this.currentQuestId);
+
+        // Auto-sync previous work to Firebase Cloud if any
+        const student = window.storageManager.getStudent();
+        if (student && progress && (progress.completedQuests.length > 0 || Object.keys(progress.questCodes || {}).length > 0)) {
+            setTimeout(() => {
+                if (window.firebaseService) {
+                    window.firebaseService.saveSubmission(student, progress);
+                    console.log("Auto-synced existing work to Firebase Cloud ☁️⚡");
+                }
+            }, 1000);
+        }
     }
 
     renderHeader() {
