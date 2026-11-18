@@ -129,7 +129,7 @@ class ArenaController {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = `quest-tab-btn ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`;
-            btn.title = `${q.title} (${q.difficulty})`;
+            btn.title = q.title;
 
             let icon = isPassed ? '✔' : (isActive ? '★' : '•');
             btn.innerHTML = `<span class="tab-status-icon">${icon}</span> ภารกิจ ${q.id}`;
@@ -180,7 +180,7 @@ class ArenaController {
         // Reset Terminal & Banner
         this.hideValidationBanner();
         const terminal = document.getElementById('terminal-output-area');
-        terminal.innerHTML = `<span class="terminal-prompt">&gt; ข้อที่ ${quest.id}: ${quest.title}</span>\n<span class="terminal-prompt">&gt; เขียนโค้ดในหน้าต่างด้านบน แล้วกด [▶ รันโค้ด] เพื่อทดสอบ หรือ [🚀 ส่งคำตอบ]</span>\n<span class="terminal-cursor"></span>`;
+        terminal.innerHTML = `<span class="terminal-prompt">&gt; ${quest.title}</span>\n<span class="terminal-prompt">&gt; เขียนโค้ดในหน้าต่างด้านบน แล้วกด [▶ รันโค้ด] เพื่อทดสอบ หรือ [🚀 ส่งคำตอบ]</span>\n<span class="terminal-cursor"></span>`;
 
         this.renderQuestRibbon();
 
