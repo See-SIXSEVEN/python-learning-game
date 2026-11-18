@@ -15,8 +15,8 @@ class ArenaController {
         }
 
         this.initCodeEditor();
-        this.bindEvents();
         this.loadState();
+        this.bindEvents();
     }
 
     initCodeEditor() {
@@ -308,12 +308,18 @@ class ArenaController {
     }
 
     bindEvents() {
+        // Safe event listener helper
+        const on = (id, event, handler) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener(event, handler);
+        };
+
         // Run & Submit
-        document.getElementById('btn-run-code').addEventListener('click', () => this.handleRunCode());
-        document.getElementById('btn-submit-answer').addEventListener('click', () => this.handleSubmitCode());
+        on('btn-run-code', 'click', () => this.handleRunCode());
+        on('btn-submit-answer', 'click', () => this.handleSubmitCode());
 
         // Banner Next Button
-        document.getElementById('btn-banner-next').addEventListener('click', () => {
+        on('btn-banner-next', 'click', () => {
             if (this.currentQuestId < 4) {
                 this.loadQuest(this.currentQuestId + 1);
             } else {
@@ -322,12 +328,12 @@ class ArenaController {
         });
 
         // Prev & Next Quest Footer
-        document.getElementById('btn-prev-quest').addEventListener('click', () => {
+        on('btn-prev-quest', 'click', () => {
             if (this.currentQuestId > 1) {
                 this.loadQuest(this.currentQuestId - 1);
             }
         });
-        document.getElementById('btn-next-quest').addEventListener('click', () => {
+        on('btn-next-quest', 'click', () => {
             if (this.currentQuestId < 4) {
                 this.loadQuest(this.currentQuestId + 1);
             } else {
@@ -336,7 +342,7 @@ class ArenaController {
         });
 
         // Reset Code
-        document.getElementById('btn-reset-code').addEventListener('click', () => {
+        on('btn-reset-code', 'click', () => {
             const quest = window.QUESTS.find(q => q.id === this.currentQuestId);
             if (quest && this.editor) {
                 this.editor.setValue(quest.starterCode);
@@ -347,13 +353,13 @@ class ArenaController {
         });
 
         // Zoom In & Out
-        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+        on('btn-zoom-in', 'click', () => {
             if (this.fontSize < 24) {
                 this.fontSize += 2;
                 this.updateEditorFontSize();
             }
         });
-        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+        on('btn-zoom-out', 'click', () => {
             if (this.fontSize > 12) {
                 this.fontSize -= 2;
                 this.updateEditorFontSize();
@@ -361,29 +367,22 @@ class ArenaController {
         });
 
         // Clear Terminal
-        document.getElementById('btn-clear-terminal').addEventListener('click', () => {
+        on('btn-clear-terminal', 'click', () => {
             const terminal = document.getElementById('terminal-output-area');
-            terminal.innerHTML = '<span class="terminal-prompt">&gt; จอภาพถูกเคลียร์แล้ว</span><span class="terminal-cursor"></span>';
-            window.soundFX.playClick();
-        });
-
-        // Hint Toggle
-        document.getElementById('hint-toggle-btn').addEventListener('click', () => {
-            const hintBody = document.getElementById('hint-body-content');
-            const arrow = document.getElementById('hint-arrow');
-            const isOpen = hintBody.classList.toggle('open');
-            arrow.textContent = isOpen ? '▲' : '▼';
+            if (terminal) {
+                terminal.innerHTML = '<span class="terminal-prompt">&gt; จอภาพถูกเคลียร์แล้ว</span><span class="terminal-cursor"></span>';
+            }
             window.soundFX.playClick();
         });
 
         // Sound Toggle
-        document.getElementById('btn-toggle-sound').addEventListener('click', () => {
+        on('btn-toggle-sound', 'click', () => {
             window.soundFX.toggleMute();
             this.updateSoundIcon();
         });
 
         // CRT Toggle
-        document.getElementById('btn-toggle-crt').addEventListener('click', () => {
+        on('btn-toggle-crt', 'click', () => {
             document.body.classList.toggle('crt-off');
             const isOff = document.body.classList.contains('crt-off');
             localStorage.setItem('pyquest_crt', isOff ? 'off' : 'on');
@@ -393,25 +392,25 @@ class ArenaController {
 
         // Cheat Sheet Modal
         const modalCheat = document.getElementById('modal-cheatsheet');
-        document.getElementById('btn-cheatsheet').addEventListener('click', () => {
-            modalCheat.classList.add('active');
+        on('btn-cheatsheet', 'click', () => {
+            if (modalCheat) modalCheat.classList.add('active');
             window.soundFX.playClick();
         });
-        document.getElementById('btn-close-cheatsheet').addEventListener('click', () => {
-            modalCheat.classList.remove('active');
+        on('btn-close-cheatsheet', 'click', () => {
+            if (modalCheat) modalCheat.classList.remove('active');
         });
-        document.getElementById('btn-close-cheatsheet-bottom').addEventListener('click', () => {
-            modalCheat.classList.remove('active');
+        on('btn-close-cheatsheet-bottom', 'click', () => {
+            if (modalCheat) modalCheat.classList.remove('active');
         });
 
         // Navigation to Summary Page
-        document.getElementById('btn-goto-summary').addEventListener('click', () => {
+        on('btn-goto-summary', 'click', () => {
             window.soundFX.playClick();
             window.location.href = 'summary.html';
         });
 
         // Switch User -> Back to Registration Page
-        document.getElementById('btn-switch-user').addEventListener('click', () => {
+        on('btn-switch-user', 'click', () => {
             this.openConfirmModal(
                 "เปลี่ยนผู้ใช้งาน",
                 "คุณต้องการกลับไปยังหน้าลงทะเบียนเพื่อเปลี่ยนผู้ใช้งานหรือไม่?",
@@ -423,8 +422,12 @@ class ArenaController {
 
         // Modal Confirmation Close Handlers
         const modalConfirm = document.getElementById('modal-confirm');
-        document.getElementById('btn-close-modal').addEventListener('click', () => modalConfirm.classList.remove('active'));
-        document.getElementById('btn-modal-cancel').addEventListener('click', () => modalConfirm.classList.remove('active'));
+        on('btn-close-modal', 'click', () => {
+            if (modalConfirm) modalConfirm.classList.remove('active');
+        });
+        on('btn-modal-cancel', 'click', () => {
+            if (modalConfirm) modalConfirm.classList.remove('active');
+        });
     }
 
     openConfirmModal(title, desc, onConfirm) {
