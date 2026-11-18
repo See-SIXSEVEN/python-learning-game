@@ -190,6 +190,73 @@ class TeacherDashboard {
             });
         }
 
+        // Sync ALL Firebase data to Sheets
+        const btnSyncAllSheets = document.getElementById('btn-sync-all-sheets');
+        if (btnSyncAllSheets) {
+            btnSyncAllSheets.addEventListener('click', async () => {
+                const url = document.getElementById('sheets-webhook-url').value.trim();
+                if (!url) {
+                    alert("กรุณากรอก URL และกดบันทึกก่อน แล้วค่อยกดซิงค์ครับ");
+                    return;
+                }
+
+                btnSyncAllSheets.disabled = true;
+                btnSyncAllSheets.textContent = "⏳ กำลังซิงค์...";
+
+                try {
+                    // Pull all from Firebase
+                    let list = [];
+                    if (window.firebaseService && window.firebaseService.isReady) {
+                        const snap = await window.firebaseService.db.ref('submissions').once('value');
+                        const data = snap.val();
+                        if (data) {
+                            Object.values(data).forEach(s => list.push(s));
+                        }
+                    } else {
+                        list = window.storageManager.getAllSubmissions();
+                    }
+
+                    if (list.length === 0) {
+                        alert("ไม่มีข้อมูลนักเรียนใน Firebase ครับ");
+                        return;
+                    }
+
+                    let successCount = 0;
+                    for (const s of list) {
+                        const gradingScore = (s.grading && s.grading.isGraded) ? s.grading.totalScore : (s.xp || 0);
+                        const gradingStatus = (s.grading && s.grading.isGraded) ? 'ตรวจแล้ว' : 'รอครูตรวจ';
+                        const passedCount = (s.completedQuests || []).length;
+
+                        await fetch(url, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: s.name || '-',
+                                grade: s.grade || '-',
+                                no: s.no || '-',
+                                xp: gradingScore,
+                                badge: (s.grading && s.grading.isGraded) ? `✅ ${gradingScore}/100` : (s.badge || '-'),
+                                completedQuests: `${passedCount} / 4 ภารกิจ`,
+                                gradingStatus: gradingStatus,
+                                feedback: (s.grading && s.grading.feedback) || '-',
+                                timestamp: s.updatedAt || new Date().toISOString()
+                            })
+                        });
+                        successCount++;
+                    }
+
+                    window.soundFX.playSuccess();
+                    alert(`✅ ซิงค์ข้อมูลนักเรียน ${successCount} คน เข้า Google Sheets เรียบร้อยแล้ว!\nกรุณาเปิดชีตเพื่อตรวจสอบ`);
+                } catch (err) {
+                    alert("เกิดข้อผิดพลาด: " + err.message);
+                } finally {
+                    btnSyncAllSheets.disabled = false;
+                    btnSyncAllSheets.textContent = "📤 ซิงค์ข้อมูลทั้งหมด → Sheets";
+                }
+            });
+        }
+
         if (btnTestSheets) {
             btnTestSheets.addEventListener('click', async () => {
                 const url = document.getElementById('sheets-webhook-url').value.trim();

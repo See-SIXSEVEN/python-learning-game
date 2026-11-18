@@ -216,16 +216,26 @@
                     <pre style="background: #0f172a; padding: 10px; border-radius: 4px; margin-top: 8px; font-family: var(--font-code); font-size: 0.8rem; overflow-x: auto; color: #7dd3fc;">function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["วันเวลา", "ชื่อ-นามสกุล", "ชั้น", "เลขที่", "คะแนน XP", "ฉายา", "ภารกิจที่ผ่าน"]);
+    sheet.appendRow(["วันเวลา", "ชื่อ-นามสกุล", "ชั้น", "เลขที่", "คะแนน", "สถานะตรวจ", "ภารกิจที่ผ่าน", "คำแนะนำจากครู"]);
   }
   var data = JSON.parse(e.postData.contents);
-  sheet.appendRow([new Date(), data.name, data.grade, data.no, data.xp, data.badge, data.completedQuests]);
+  sheet.appendRow([
+    data.timestamp || new Date(),
+    data.name,
+    data.grade,
+    data.no,
+    data.xp,
+    data.gradingStatus || "รอครูตรวจ",
+    data.completedQuests,
+    data.feedback || "-"
+  ]);
   return ContentService.createTextOutput("OK").setMimeType(ContentService.MimeType.TEXT);
 }</pre>
                 </details>
 
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
                     <button type="button" class="pixel-btn pixel-btn-dark" id="btn-test-sheets">🧪 ทดสอบส่งข้อมูล</button>
+                    <button type="button" class="pixel-btn pixel-btn-success" id="btn-sync-all-sheets">📤 ซิงค์ข้อมูลทั้งหมด → Sheets</button>
                     <button type="button" class="pixel-btn pixel-btn-primary" id="btn-save-sheets">💾 บันทึกการเชื่อมต่อ</button>
                 </div>
             </div>
