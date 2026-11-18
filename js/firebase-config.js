@@ -125,3 +125,4 @@ class FirebaseService {
 if (typeof window !== 'undefined') {
     window.firebaseService = new FirebaseService();
 }
+

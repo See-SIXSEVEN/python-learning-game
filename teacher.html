@@ -175,7 +175,7 @@
                     <h3 class="modal-title" id="inspect-modal-title">🔍 ตรวจโค้ดของนักเรียน</h3>
                     <div id="inspect-modal-sub" style="font-size: 0.85rem; color: var(--text-muted);">เด็กชาย...</div>
                 </div>
-                <button type="button" class="modal-close-btn" id="btn-close-inspect">✕</button>
+                <button type="button" class="modal-close-btn" id="btn-close-inspect" onclick="document.getElementById('modal-inspect-code').classList.remove('active');">✕</button>
             </div>
             <div id="inspect-quests-container" style="max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;">
                 <!-- Populated by JS -->
@@ -239,14 +239,14 @@
     <!-- Firebase Realtime Database SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="js/firebase-config.js?v=2.3"></script>
+    <script src="js/firebase-config.js?v=2.4"></script>
 
     <!-- Scripts (with Cache Busting) -->
-    <script src="js/audio.js?v=2.3"></script>
-    <script src="js/quests.js?v=2.3"></script>
-    <script src="js/validator.js?v=2.3"></script>
-    <script src="js/storage.js?v=2.3"></script>
-    <script src="js/teacher.js?v=2.3"></script>
+    <script src="js/audio.js?v=2.4"></script>
+    <script src="js/quests.js?v=2.4"></script>
+    <script src="js/validator.js?v=2.4"></script>
+    <script src="js/storage.js?v=2.4"></script>
+    <script src="js/teacher.js?v=2.4"></script>
 </body>
 </html>
 

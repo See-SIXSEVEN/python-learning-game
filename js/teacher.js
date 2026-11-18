@@ -120,8 +120,21 @@ class TeacherDashboard {
         if (btnRefresh) {
             btnRefresh.addEventListener('click', () => {
                 window.soundFX.playClick();
-                this.loadData();
-                this.renderTable();
+                // Pull fresh from Firebase Realtime DB
+                if (window.firebaseService && window.firebaseService.isReady) {
+                    window.firebaseService.db.ref('submissions').once('value').then((snapshot) => {
+                        const data = snapshot.val();
+                        const list = [];
+                        if (data) {
+                            Object.keys(data).forEach(key => list.push(data[key]));
+                        }
+                        this.allStudents = list;
+                        this.renderTable();
+                    });
+                } else {
+                    this.loadData();
+                    this.renderTable();
+                }
             });
         }
 
@@ -347,14 +360,17 @@ class TeacherDashboard {
 
         // Bind delete student buttons
         tbody.querySelectorAll('.delete-student-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 const id = btn.getAttribute('data-id');
                 const name = btn.getAttribute('data-name');
                 if (confirm(`⚠️ ยืนยันการลบนักเรียน:\n\nคุณต้องการลบข้อมูลของ "${name}" ออกจากระบบใช่หรือไม่?\n(ข้อมูลคะแนนและโค้ดของนักเรียนคนนี้จะถูกลบถาวร)`)) {
                     window.storageManager.deleteStudent(id);
+                    if (window.firebaseService) {
+                        await window.firebaseService.deleteStudent(id);
+                    }
+                    this.allStudents = this.allStudents.filter(s => s.id !== id);
                     window.soundFX.playClick();
                     alert(`ลบข้อมูลของ ${name} เรียบร้อยแล้ว`);
-                    this.loadData();
                     this.renderTable();
                 }
             });
@@ -401,8 +417,7 @@ class TeacherDashboard {
             card.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                     <div>
-                        <strong style="color: var(--text-cyan); font-size: 0.95rem;">ภารกิจที่ ${q.id}: ${q.title}</strong>
-                        <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 6px;">(${q.category})</span>
+                        <strong style="color: var(--text-cyan); font-size: 0.95rem;">${q.title}</strong>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <button type="button" class="pixel-btn pixel-btn-primary btn-run-student-code" data-qid="${q.id}" style="padding: 4px 10px; font-size: 0.75rem;">
@@ -487,7 +502,11 @@ class TeacherDashboard {
         updateTotal();
 
         // Save Grading Button
-        document.getElementById('btn-save-grading').addEventListener('click', () => {
+        document.getElementById('btn-save-grading').addEventListener('click', async () => {
+            const btnSave = document.getElementById('btn-save-grading');
+            btnSave.disabled = true;
+            btnSave.textContent = '⏳ กำลังบันทึก...';
+
             const scores = {};
             scoreInputs.forEach(inp => {
                 const qid = inp.getAttribute('data-qid');
@@ -495,13 +514,45 @@ class TeacherDashboard {
             });
             const feedback = document.getElementById('teacher-feedback-input').value.trim();
 
-            const updatedStudent = window.storageManager.saveGrading(student.id, scores, feedback);
-            if (updatedStudent) {
+            let total = 0;
+            for (const qId in scores) {
+                total += Number(scores[qId] || 0);
+            }
+
+            const gradingObj = {
+                scores: scores,
+                totalScore: total,
+                feedback: feedback,
+                gradedAt: new Date().toLocaleString('th-TH'),
+                isGraded: true
+            };
+
+            try {
+                // 1. Save to LocalStorage if available
+                window.storageManager.saveGrading(student.id, scores, feedback);
+
+                // 2. Direct Save to Firebase Realtime Cloud!
+                if (window.firebaseService) {
+                    await window.firebaseService.saveGrading(student.id, gradingObj);
+                }
+
+                // 3. Update current student record in memory
+                student.grading = gradingObj;
+                const existingIdx = this.allStudents.findIndex(s => s.id === student.id);
+                if (existingIdx >= 0) {
+                    this.allStudents[existingIdx].grading = gradingObj;
+                }
+
                 window.soundFX.playSuccess();
-                alert(`บันทึกผลการตรวจของ ${student.name} เรียบร้อยแล้ว!`);
+                alert(`✅ บันทึกผลการตรวจและคำแนะนำของ ${student.name} เรียบร้อยแล้ว!`);
                 modal.classList.remove('active');
-                this.loadData();
                 this.renderTable();
+            } catch (err) {
+                console.error("Grading save error:", err);
+                alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<span>💾 บันทึกคะแนนและคำแนะนำ</span>';
             }
         });
 

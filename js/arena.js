@@ -429,14 +429,39 @@ class ArenaController {
         document.getElementById('modal-confirm-title').textContent = title;
         document.getElementById('modal-confirm-desc').textContent = desc;
 
+        const closeModal = () => {
+            modal.classList.remove('active');
+            window.soundFX.playClick();
+        };
+
+        const btnClose = document.getElementById('btn-close-modal');
+        const btnCancel = document.getElementById('btn-modal-cancel');
         const btnOk = document.getElementById('btn-modal-ok');
+
+        // Rebind Close button
+        const newBtnClose = btnClose.cloneNode(true);
+        btnClose.parentNode.replaceChild(newBtnClose, btnClose);
+        newBtnClose.addEventListener('click', closeModal);
+
+        // Rebind Cancel button
+        const newBtnCancel = btnCancel.cloneNode(true);
+        btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+        newBtnCancel.addEventListener('click', closeModal);
+
+        // Rebind OK button
         const newBtnOk = btnOk.cloneNode(true);
         btnOk.parentNode.replaceChild(newBtnOk, btnOk);
-
         newBtnOk.addEventListener('click', () => {
             modal.classList.remove('active');
             if (typeof onConfirm === 'function') onConfirm();
         });
+
+        // Click outside backdrop to close
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        };
 
         modal.classList.add('active');
         window.soundFX.playClick();
