@@ -246,14 +246,25 @@ class StorageManager {
         const raw = localStorage.getItem(this.SUBMISSIONS_KEY);
         let list = raw ? JSON.parse(raw) : [];
 
-        const studentKey = `${student.name}_${student.grade}_${student.no}`;
+        // Build key using both students' nos if partner exists
+        const partnerSuffix = student.partner ? `_${student.partner.no}` : '';
+        const studentKey = `${student.name}_${student.grade}_${student.no}${partnerSuffix}`;
+
+        // Build display name and no showing pair
+        const displayName = student.partner
+            ? `${student.name} & ${student.partner.name}`
+            : student.name;
+        const displayNo = student.partner
+            ? `${student.no} & ${student.partner.no}`
+            : student.no;
+
         const rank = this.getRankInfo(progress.totalXP || 0);
 
         const record = {
             id: studentKey,
-            name: student.name,
+            name: displayName,
             grade: student.grade,
-            no: student.no,
+            no: displayNo,
             avatar: student.avatar || '⚡',
             xp: progress.totalXP || 0,
             badge: `${rank.badgeIcon} ${rank.title}`,
@@ -262,7 +273,9 @@ class StorageManager {
             questScores: progress.questScores || {},
             questCodes: progress.questCodes || {},
             updatedAt: new Date().toLocaleString('th-TH'),
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            student1: { name: student.name, grade: student.grade, no: student.no },
+            student2: student.partner || null
         };
 
         const existingIdx = list.findIndex(item => item.id === studentKey);

@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const student = window.storageManager.getStudent();
     const progress = window.storageManager.getProgress();
-    const studentKey = `${student.name}_${student.grade}_${student.no}`;
+
+    // Build pair key (must match recordSubmission key)
+    const partnerSuffix = student.partner ? `_${student.partner.no}` : '';
+    const studentKey = `${student.name}_${student.grade}_${student.no}${partnerSuffix}`;
 
     // Find student submission with teacher grading from LocalStorage initially
     const allSubs = window.storageManager.getAllSubmissions();
@@ -37,7 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreQuestsEl = document.getElementById('summary-score-quests');
 
     if (stampThai) {
-        stampThai.textContent = `${student.name} (${student.grade} เลขที่ ${student.no})`;
+        // Show both names if pair
+        const partnerInfo = student.partner
+            ? ` & ${student.partner.name} (เลขที่ ${student.partner.no})`
+            : '';
+        stampThai.textContent = `${student.name} (${student.grade} เลขที่ ${student.no})${partnerInfo}`;
     }
 
     const completedCount = (progress.completedQuests || []).length;
@@ -144,7 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen to Realtime Grading updates from Firebase Cloud
     if (window.firebaseService && window.firebaseService.isReady) {
-        const safeK = window.firebaseService.safeKey(`${student.grade}_${student.no}_${student.name}`);
+        const partnerSuffix = student.partner ? `_${student.partner.no}` : '';
+        const safeK = window.firebaseService.safeKey(`${student.grade}_${student.no}${partnerSuffix}_${student.name}`);
         
         // Immediate fetch from Firebase
         window.firebaseService.db.ref(`submissions/${safeK}`).once('value').then(snap => {

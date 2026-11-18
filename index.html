@@ -58,7 +58,7 @@
                         <span>▶ ไปหน้าทำแบบฝึกหัดต่อ</span>
                     </button>
                     <button type="button" class="pixel-btn pixel-btn-dark" id="btn-new-register">
-                        <span>🔄 กรอกข้อมูลคนใหม่</span>
+                        <span>🔄 กรอกข้อมูลคู่ใหม่</span>
                     </button>
                 </div>
             </div>
@@ -66,38 +66,74 @@
             <!-- Registration Form Box -->
             <div class="reg-form-box" id="reg-form-wrapper">
                 <form id="registration-form">
-                    <div class="form-group">
-                        <label class="form-label" for="reg-fullname">👤 ชื่อ - นามสกุล นักเรียน</label>
-                        <input type="text" id="reg-fullname" class="form-input" placeholder="เช่น เด็กชายกิตติคุณ สดใส" required autocomplete="name">
+
+                    <!-- STUDENT 1 -->
+                    <div style="background: rgba(34,197,94,0.07); border: 1px solid var(--border-green); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;">
+                        <div style="font-size: 0.82rem; color: var(--text-green); font-weight: 700; margin-bottom: 10px; font-family: var(--font-pixel);">👤 นักเรียนคนที่ 1</div>
+                        <div class="form-group">
+                            <label class="form-label" for="reg-fullname">ชื่อ - นามสกุล</label>
+                            <input type="text" id="reg-fullname" class="form-input" placeholder="เช่น เด็กชายกิตติคุณ สดใส" required autocomplete="off">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="reg-grade">🏫 ชั้นมัธยมศึกษา</label>
+                                <select id="reg-grade" class="form-select" required>
+                                    <option value="ม.3/1">มัธยมศึกษาปีที่ 3/1</option>
+                                    <option value="ม.3/2">มัธยมศึกษาปีที่ 3/2</option>
+                                    <option value="ม.3/3">มัธยมศึกษาปีที่ 3/3</option>
+                                    <option value="ม.3/4">มัธยมศึกษาปีที่ 3/4</option>
+                                    <option value="ม.3/5">มัธยมศึกษาปีที่ 3/5</option>
+                                    <option value="ม.3/6">มัธยมศึกษาปีที่ 3/6</option>
+                                    <option value="ม.3/7">มัธยมศึกษาปีที่ 3/7</option>
+                                    <option value="ม.3/8">มัธยมศึกษาปีที่ 3/8</option>
+                                    <option value="ม.3/9">มัธยมศึกษาปีที่ 3/9</option>
+                                    <option value="ม.3/10">มัธยมศึกษาปีที่ 3/10</option>
+                                    <option value="ม.3/11">มัธยมศึกษาปีที่ 3/11</option>
+                                    <option value="ม.3/12">มัธยมศึกษาปีที่ 3/12</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="reg-number">🔢 เลขที่</label>
+                                <input type="number" id="reg-number" class="form-input" min="1" max="60" placeholder="เช่น 12" required>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-row">
+                    <!-- STUDENT 2 -->
+                    <div style="background: rgba(56,189,248,0.07); border: 1px solid var(--border-neon); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;">
+                        <div style="font-size: 0.82rem; color: var(--text-cyan); font-weight: 700; margin-bottom: 10px; font-family: var(--font-pixel);">👤 นักเรียนคนที่ 2</div>
                         <div class="form-group">
-                            <label class="form-label" for="reg-grade">🏫 ชั้นมัธยมศึกษา</label>
-                            <select id="reg-grade" class="form-select" required>
-                                <option value="ม.3/1">มัธยมศึกษาปีที่ 3/1</option>
-                                <option value="ม.3/2">มัธยมศึกษาปีที่ 3/2</option>
-                                <option value="ม.3/3">มัธยมศึกษาปีที่ 3/3</option>
-                                <option value="ม.3/4">มัธยมศึกษาปีที่ 3/4</option>
-                                <option value="ม.3/5">มัธยมศึกษาปีที่ 3/5</option>
-                                <option value="ม.3/6">มัธยมศึกษาปีที่ 3/6</option>
-                                <option value="ม.3/7">มัธยมศึกษาปีที่ 3/7</option>
-                                <option value="ม.3/8">มัธยมศึกษาปีที่ 3/8</option>
-                                <option value="ม.3/9">มัธยมศึกษาปีที่ 3/9</option>
-                                <option value="ม.3/10">มัธยมศึกษาปีที่ 3/10</option>
-                                <option value="ม.3/11">มัธยมศึกษาปีที่ 3/11</option>
-                                <option value="ม.3/12">มัธยมศึกษาปีที่ 3/12</option>
-                            </select>
+                            <label class="form-label" for="reg-fullname2">ชื่อ - นามสกุล</label>
+                            <input type="text" id="reg-fullname2" class="form-input" placeholder="เช่น เด็กหญิงสมหญิง ใจดี" required autocomplete="off">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="reg-number">🔢 เลขที่</label>
-                            <input type="number" id="reg-number" class="form-input" min="1" max="60" placeholder="เช่น 12" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="reg-grade2">🏫 ชั้นมัธยมศึกษา</label>
+                                <select id="reg-grade2" class="form-select" required>
+                                    <option value="ม.3/1">มัธยมศึกษาปีที่ 3/1</option>
+                                    <option value="ม.3/2">มัธยมศึกษาปีที่ 3/2</option>
+                                    <option value="ม.3/3">มัธยมศึกษาปีที่ 3/3</option>
+                                    <option value="ม.3/4">มัธยมศึกษาปีที่ 3/4</option>
+                                    <option value="ม.3/5">มัธยมศึกษาปีที่ 3/5</option>
+                                    <option value="ม.3/6">มัธยมศึกษาปีที่ 3/6</option>
+                                    <option value="ม.3/7">มัธยมศึกษาปีที่ 3/7</option>
+                                    <option value="ม.3/8">มัธยมศึกษาปีที่ 3/8</option>
+                                    <option value="ม.3/9">มัธยมศึกษาปีที่ 3/9</option>
+                                    <option value="ม.3/10">มัธยมศึกษาปีที่ 3/10</option>
+                                    <option value="ม.3/11">มัธยมศึกษาปีที่ 3/11</option>
+                                    <option value="ม.3/12">มัธยมศึกษาปีที่ 3/12</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="reg-number2">🔢 เลขที่</label>
+                                <input type="number" id="reg-number2" class="form-input" min="1" max="60" placeholder="เช่น 13" required>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Character Avatar Selection -->
                     <div class="form-group">
-                        <label class="form-label">👾 เลือกอวาตาร์ประจำตัว</label>
+                        <label class="form-label">👾 เลือกอวาตาร์ประจำกลุ่ม</label>
                         <div class="avatar-selector">
                             <div class="avatar-option selected" data-avatar="⚡" title="Lightning Ninja">⚡</div>
                             <div class="avatar-option" data-avatar="🧙" title="Pixel Mage">🧙</div>

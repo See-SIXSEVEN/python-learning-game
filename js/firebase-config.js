@@ -45,14 +45,24 @@ class FirebaseService {
     async saveSubmission(student, progress, grading) {
         if (!this.isReady || !student) return;
 
-        const studentKey = this.safeKey(`${student.grade}_${student.no}_${student.name}`);
+        // Key uses grade + no of student1 (and no of partner if exists)
+        const partnerSuffix = student.partner ? `_${student.partner.no}` : '';
+        const studentKey = this.safeKey(`${student.grade}_${student.no}${partnerSuffix}_${student.name}`);
         const rank = window.storageManager ? window.storageManager.getRankInfo(progress.totalXP || 0) : { title: "Novice" };
+
+        // Build display name showing both students
+        const displayName = student.partner
+            ? `${student.name} & ${student.partner.name}`
+            : student.name;
+        const displayNo = student.partner
+            ? `${student.no} & ${student.partner.no}`
+            : student.no;
 
         const payload = {
             id: studentKey,
-            name: student.name,
+            name: displayName,
             grade: student.grade,
-            no: student.no,
+            no: displayNo,
             avatar: student.avatar || '⚡',
             xp: progress.totalXP || 0,
             badge: rank.title,
@@ -60,7 +70,10 @@ class FirebaseService {
             questScores: progress.questScores || {},
             questCodes: progress.questCodes || {},
             updatedAt: new Date().toLocaleString('th-TH'),
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            // Store raw partner data for reference
+            student1: { name: student.name, grade: student.grade, no: student.no },
+            student2: student.partner || null
         };
 
         if (grading) {

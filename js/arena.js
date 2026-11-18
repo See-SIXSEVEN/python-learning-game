@@ -92,8 +92,11 @@ class ArenaController {
         if (!student) return;
 
         document.getElementById('header-student-avatar').textContent = student.avatar || '⚡';
-        document.getElementById('header-student-name').textContent = student.name;
-        document.getElementById('header-student-sub').textContent = `${student.grade} • เลขที่ ${student.no}`;
+        // Show pair names in header
+        const partnerInfo = student.partner ? ` & ${student.partner.name}` : '';
+        document.getElementById('header-student-name').textContent = student.name + partnerInfo;
+        const partnerNo = student.partner ? ` & เลขที่ ${student.partner.no}` : '';
+        document.getElementById('header-student-sub').textContent = `${student.grade} • เลขที่ ${student.no}${partnerNo}`;
 
         this.updateXPBar();
     }
