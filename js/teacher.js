@@ -275,9 +275,9 @@ class TeacherDashboard {
                             name: "ทดสอบระบบ (คุณครู)",
                             grade: "ม.3/1",
                             no: "99",
-                            xp: 100,
+                            xp: 2.0,
                             badge: "👑 Grandmaster Test",
-                            completedQuests: "10 / 10 ภารกิจ (ทดสอบ)",
+                            completedQuests: "4 / 4 ภารกิจ (ทดสอบ)",
                             timestamp: new Date().toISOString()
                         })
                     });
@@ -375,7 +375,7 @@ class TeacherDashboard {
             const completedCount = (student.completedQuests || []).length;
             const grading = student.grading || null;
             const isGraded = grading && grading.isGraded;
-            const displayScore = isGraded ? `${grading.totalScore} คะแนน` : `${student.xp} / 100 XP`;
+            const displayScore = isGraded ? `${grading.totalScore} คะแนน` : `${student.xp} / 2.0`;
 
             tr.innerHTML = `
                 <td style="font-family: var(--font-pixel); font-size: 0.8rem;">${medal}</td>
@@ -445,10 +445,10 @@ class TeacherDashboard {
 
     updateStats(list) {
         const total = list.length;
-        const totalXP = list.reduce((sum, s) => sum + (s.xp || 0), 0);
-        const avg = total > 0 ? (totalXP / total).toFixed(1) : 0;
-        const grandmasters = list.filter(s => s.xp >= 100).length;
-        const passed = list.filter(s => s.xp >= 50).length;
+        const totalXP = list.reduce((sum, s) => sum + ((s.grading && s.grading.isGraded) ? s.grading.totalScore : (s.xp || 0)), 0);
+        const avg = total > 0 ? (totalXP / total).toFixed(2) : 0;
+        const grandmasters = list.filter(s => ((s.grading && s.grading.isGraded) ? s.grading.totalScore : (s.xp || 0)) >= 2.0).length;
+        const passed = list.filter(s => ((s.grading && s.grading.isGraded) ? s.grading.totalScore : (s.xp || 0)) >= 1.0).length;
         const passRate = total > 0 ? Math.round((passed / total) * 100) : 0;
 
         document.getElementById('stat-total-students').textContent = total;
@@ -472,7 +472,7 @@ class TeacherDashboard {
         window.QUESTS.forEach(q => {
             const isPassed = (student.completedQuests || []).includes(q.id);
             const studentCode = codes[q.id] || '';
-            const existingScore = (grading.scores && grading.scores[q.id] !== undefined) ? grading.scores[q.id] : (isPassed ? 25 : 0);
+            const existingScore = (grading.scores && grading.scores[q.id] !== undefined) ? grading.scores[q.id] : (isPassed ? 0.5 : 0);
 
             const card = document.createElement('div');
             card.style.background = '#0b1120';
@@ -491,8 +491,8 @@ class TeacherDashboard {
                         </button>
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <label style="font-size: 0.8rem; color: var(--text-yellow);">คะแนน:</label>
-                            <input type="number" min="0" max="25" step="0.5" class="form-input quest-score-input" data-qid="${q.id}" value="${existingScore}" style="width: 70px; padding: 4px 6px; text-align: center; font-size: 0.85rem;">
-                            <span style="font-size: 0.8rem; color: var(--text-muted);">/ 25</span>
+                            <input type="number" min="0" max="0.5" step="0.1" class="form-input quest-score-input" data-qid="${q.id}" value="${existingScore}" style="width: 70px; padding: 4px 6px; text-align: center; font-size: 0.85rem;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">/ 0.5</span>
                         </div>
                     </div>
                 </div>
@@ -523,7 +523,7 @@ class TeacherDashboard {
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div style="font-size: 0.9rem; color: var(--text-main);">
-                    คะแนนรวมที่ได้: <strong id="grading-total-preview" style="color: var(--text-green); font-size: 1.1rem; font-family: var(--font-pixel);">${grading.totalScore || 0}</strong> / 100 คะแนน
+                    คะแนนรวมที่ได้: <strong id="grading-total-preview" style="color: var(--text-green); font-size: 1.1rem; font-family: var(--font-pixel);">${grading.totalScore || 0}</strong> / 2.0 คะแนน
                 </div>
                 <button type="button" class="pixel-btn pixel-btn-success" id="btn-save-grading" style="padding: 10px 18px;">
                     <span>💾 บันทึกคะแนนและคำแนะนำ</span>
@@ -562,7 +562,7 @@ class TeacherDashboard {
         const updateTotal = () => {
             let sum = 0;
             scoreInputs.forEach(inp => sum += Number(inp.value || 0));
-            document.getElementById('grading-total-preview').textContent = sum;
+            document.getElementById('grading-total-preview').textContent = parseFloat(sum.toFixed(2));
         };
         scoreInputs.forEach(inp => inp.addEventListener('input', updateTotal));
         updateTotal();
@@ -587,7 +587,7 @@ class TeacherDashboard {
 
             const gradingObj = {
                 scores: scores,
-                totalScore: total,
+                totalScore: parseFloat(total.toFixed(2)),
                 feedback: feedback,
                 gradedAt: new Date().toLocaleString('th-TH'),
                 isGraded: true
@@ -639,7 +639,7 @@ class TeacherDashboard {
             return parseInt(a.no || 99) - parseInt(b.no || 99);
         });
 
-        let csv = "\uFEFFลำดับ,ชื่อ-นามสกุล,ห้อง,เลขที่,คะแนนที่ครูตรวจ (100),ภารกิจที่ส่ง (4),สถานะการตรวจ,ข้อเสนอแนะจากครู,เวลาที่บันทึก\n";
+        let csv = "\uFEFFลำดับ,ชื่อ-นามสกุล,ห้อง,เลขที่,คะแนนที่ครูตรวจ (2.0),ภารกิจที่ส่ง (4),สถานะการตรวจ,ข้อเสนอแนะจากครู,เวลาที่บันทึก\n";
         filtered.forEach((s, idx) => {
             const passedCount = (s.completedQuests || []).length;
             const grading = s.grading || {};

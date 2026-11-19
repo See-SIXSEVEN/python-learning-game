@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isPassed = (prog.completedQuests || []).includes(q.id);
             let questScore = '<span style="color: #64748b;">-</span>';
             if (isGrd && grd.scores && grd.scores[q.id] !== undefined) {
-                questScore = `<span style="color: #4ade80; font-weight: bold; font-size: 1rem;">${grd.scores[q.id]} / 25</span>`;
+                questScore = `<span style="color: #4ade80; font-weight: bold; font-size: 1rem;">${grd.scores[q.id]} / 0.5</span>`;
             } else if (isPassed) {
                 questScore = '<span style="color: #facc15;">รอตรวจ</span>';
             }
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentGrading = grd;
 
         if (stampTitle) {
-            stampTitle.textContent = `👑 คะแนนที่ได้: ${grd.totalScore} / 100`;
+            stampTitle.textContent = `👑 คะแนนที่ได้: ${grd.totalScore} / 2.0`;
         }
 
         if (statusEl) {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             } else {
                 feedbackBox.innerHTML = `
-                    <span style="color: #4ade80;">✔ คุณครูตรวจประเมินเรียบร้อยแล้ว ได้คะแนนรวม <strong>${grd.totalScore}</strong> / 100 คะแนน</span>
+                    <span style="color: #4ade80;">✔ คุณครูตรวจประเมินเรียบร้อยแล้ว ได้คะแนนรวม <strong>${grd.totalScore}</strong> / 2.0 คะแนน</span>
                 `;
             }
         }
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-export-csv').addEventListener('click', () => {
         const score = currentGrading && currentGrading.isGraded ? currentGrading.totalScore : progress.totalXP;
         const status = currentGrading && currentGrading.isGraded ? 'ตรวจแล้ว' : 'รอครูตรวจ';
-        let csv = "\uFEFFชื่อ-นามสกุล,ห้อง,เลขที่,คะแนนที่ได้ (100),สถานะ,ข้อเสนอแนะจากครู\n";
+        let csv = "\uFEFFชื่อ-นามสกุล,ห้อง,เลขที่,คะแนนที่ได้ (2.0),สถานะ,ข้อเสนอแนะจากครู\n";
         csv += `"${student.name}","${student.grade}","${student.no}",${score},"${status}","${(currentGrading && currentGrading.feedback) || '-'}"\n`;
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -220,12 +220,13 @@ function prepareAndPrintReport(student, progress, grading, rank) {
     document.getElementById('print-student-name').textContent = student.name;
     document.getElementById('print-student-grade').textContent = student.grade;
     document.getElementById('print-student-no').textContent = student.no;
-    document.getElementById('print-total-xp').textContent = `${finalScore} / 100 คะแนน`;
+    document.getElementById('print-total-xp').textContent = `${finalScore} / 2.0 คะแนน`;
 
-    let gradeLevel = "ผ่านเกณฑ์ระดับดีเยี่ยม (100%)";
-    if (finalScore >= 80) gradeLevel = "ผ่านเกณฑ์ระดับดีมาก (80-90%)";
-    else if (finalScore >= 60) gradeLevel = "ผ่านเกณฑ์ระดับดี (60-70%)";
-    else if (finalScore >= 50) gradeLevel = "ผ่านเกณฑ์ขั้นพื้นฐาน (50%)";
+    let gradeLevel = "ผ่านเกณฑ์ระดับดีเยี่ยม (2.0 คะแนน)";
+    if (finalScore >= 1.8) gradeLevel = "ผ่านเกณฑ์ระดับดีเยี่ยม (90-100%)";
+    else if (finalScore >= 1.5) gradeLevel = "ผ่านเกณฑ์ระดับดีมาก (75-89%)";
+    else if (finalScore >= 1.2) gradeLevel = "ผ่านเกณฑ์ระดับดี (60-74%)";
+    else if (finalScore >= 1.0) gradeLevel = "ผ่านเกณฑ์ขั้นพื้นฐาน (50-59%)";
     else gradeLevel = "ต้องพัฒนาเพิ่มเติม (ต่ำกว่า 50%)";
 
     document.getElementById('print-percentage').textContent = `ระดับผลการประเมิน: ${gradeLevel}`;
@@ -244,14 +245,14 @@ function prepareAndPrintReport(student, progress, grading, rank) {
         const isPassed = (progress.completedQuests || []).includes(q.id);
         const score = (isGraded && grading.scores && grading.scores[q.id] !== undefined)
             ? grading.scores[q.id]
-            : (isPassed ? 25 : 0);
+            : (isPassed ? 0.5 : 0);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="center">${q.id}</td>
             <td><strong>${q.title}</strong>: ${escapeHtml(q.instruction)}</td>
             <td class="center">พื้นฐาน</td>
-            <td class="center">25</td>
+            <td class="center">0.5</td>
             <td class="center"><strong>${score}</strong></td>
             <td class="center ${isPassed ? 'cert-status-pass' : ''}">${isPassed ? '✔ ส่งแล้ว' : '—'}</td>
         `;

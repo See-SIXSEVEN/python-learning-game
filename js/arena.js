@@ -110,8 +110,8 @@ class ArenaController {
         const xpText = document.getElementById('header-xp-text');
         const rankTitle = document.getElementById('header-rank-title');
 
-        if (xpFill) xpFill.style.width = `${Math.min(xp, 100)}%`;
-        if (xpText) xpText.textContent = `${xp} / 100 XP`;
+        if (xpFill) xpFill.style.width = `${Math.min(100, Math.round((xp / 2.0) * 100))}%`;
+        if (xpText) xpText.textContent = `${xp} / 2.0 คะแนน`;
         if (rankTitle) {
             rankTitle.textContent = `${rank.badgeIcon} ${rank.title}`;
             rankTitle.style.color = rank.color;
@@ -243,7 +243,7 @@ class ArenaController {
         window.soundFX.playSuccess();
         this.triggerConfetti();
 
-        const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 25);
+        const updatedProgress = window.storageManager.markQuestPassed(this.currentQuestId, code, 0.5);
         window.storageManager.recordSubmission(window.storageManager.getStudent(), updatedProgress);
         this.updateXPBar();
         this.renderQuestRibbon();

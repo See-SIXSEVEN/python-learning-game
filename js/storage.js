@@ -57,13 +57,13 @@ class StorageManager {
             return [];
         }
         return [
-            { name: "ด.ช. ภัทรดนัย วงศ์วิริยะ", grade: "ม.3/1", no: "5", xp: 100, badge: "👑 Grandmaster", avatar: "⚡", time: "12 นาที" },
-            { name: "ด.ญ. พิชญาภา สิทธิโชค", grade: "ม.3/1", no: "18", xp: 100, badge: "👑 Grandmaster", avatar: "🧙", time: "14 นาที" },
-            { name: "ด.ช. กิตติภพ รัตนสุวรรณ", grade: "ม.3/1", no: "2", xp: 90, badge: "⚡ Ninja Master", avatar: "🤖", time: "18 นาที" },
-            { name: "ด.ญ. ชนัญชิดา สุขเกษม", grade: "ม.3/1", no: "24", xp: 80, badge: "⚡ Ninja Master", avatar: "🐱", time: "21 นาที" },
-            { name: "ด.ช. นวพล ทิพยวารี", grade: "ม.3/1", no: "9", xp: 70, badge: "🛡️ Cyber Knight", avatar: "👾", time: "25 นาที" },
-            { name: "ด.ญ. ศศิธร เจริญพร", grade: "ม.3/1", no: "31", xp: 60, badge: "🛡️ Cyber Knight", avatar: "🎮", time: "29 นาที" },
-            { name: "ด.ช. ธนกร พลอยแสงงาม", grade: "ม.3/1", no: "11", xp: 50, badge: "🏹 Adventurer", avatar: "🦊", time: "32 นาที" }
+            { name: "ด.ช. ภัทรดนัย วงศ์วิริยะ", grade: "ม.3/1", no: "5", xp: 2.0, badge: "👑 Grandmaster", avatar: "⚡", time: "12 นาที" },
+            { name: "ด.ญ. พิชญาภา สิทธิโชค", grade: "ม.3/1", no: "18", xp: 2.0, badge: "👑 Grandmaster", avatar: "🧙", time: "14 นาที" },
+            { name: "ด.ช. กิตติภพ รัตนสุวรรณ", grade: "ม.3/1", no: "2", xp: 1.8, badge: "⚡ Ninja Master", avatar: "🤖", time: "18 นาที" },
+            { name: "ด.ญ. ชนัญชิดา สุขเกษม", grade: "ม.3/1", no: "24", xp: 1.6, badge: "⚡ Ninja Master", avatar: "🐱", time: "21 นาที" },
+            { name: "ด.ช. นวพล ทิพยวารี", grade: "ม.3/1", no: "9", xp: 1.4, badge: "🛡️ Cyber Knight", avatar: "👾", time: "25 นาที" },
+            { name: "ด.ญ. ศศิธร เจริญพร", grade: "ม.3/1", no: "31", xp: 1.2, badge: "🛡️ Cyber Knight", avatar: "🎮", time: "29 นาที" },
+            { name: "ด.ช. ธนกร พลอยแสงงาม", grade: "ม.3/1", no: "11", xp: 1.0, badge: "🏹 Adventurer", avatar: "🦊", time: "32 นาที" }
         ];
     }
 
@@ -115,7 +115,7 @@ class StorageManager {
         for (const qid in progress.questScores) {
             total += (progress.questScores[qid] || 0);
         }
-        progress.totalXP = total;
+        progress.totalXP = parseFloat(total.toFixed(2));
         if (progress.completedQuests.length === 4 && !progress.finishTime) {
             progress.finishTime = new Date().toISOString();
         }
@@ -153,7 +153,7 @@ class StorageManager {
 
     // Calculate Rank and Title Badge
     getRankInfo(totalXP) {
-        if (totalXP >= 100) {
+        if (totalXP >= 2.0) {
             return {
                 title: "Python Grandmaster",
                 thaiTitle: "ปรมาจารย์ไพทอนแห่ง ม.3",
@@ -162,7 +162,7 @@ class StorageManager {
                 color: "#f59e0b",
                 description: "บรรลุศาสตร์การเขียนโค้ดภาษาไพทอนระดับสูงสุด ไร้ข้อผิดพลาด!"
             };
-        } else if (totalXP >= 80) {
+        } else if (totalXP >= 1.5) {
             return {
                 title: "Code Ninja Master",
                 thaiTitle: "ยอดนินจาโค้ดระดับสูง",
@@ -171,7 +171,7 @@ class StorageManager {
                 color: "#38bdf8",
                 description: "ฝีมือเฉียบคม แก้บั๊กได้อย่างคล่องแคล่วว่องไว!"
             };
-        } else if (totalXP >= 60) {
+        } else if (totalXP >= 1.0) {
             return {
                 title: "Cyber Knight",
                 thaiTitle: "อัศวินไซเบอร์ผู้เชี่ยวชาญ",
@@ -180,7 +180,7 @@ class StorageManager {
                 color: "#a855f7",
                 description: "เข้าใจหลักการตัวแปรและการคำนวณอย่างแข็งแกร่ง!"
             };
-        } else if (totalXP >= 40) {
+        } else if (totalXP >= 0.5) {
             return {
                 title: "Code Adventurer",
                 thaiTitle: "นักผจญภัยโลกโค้ด",
@@ -189,7 +189,7 @@ class StorageManager {
                 color: "#10b981",
                 description: "ผ่านการทดสอบเบื้องต้น พร้อมลุยด่านต่อๆ ไป!"
             };
-        } else if (totalXP >= 10) {
+        } else if (totalXP > 0) {
             return {
                 title: "Python Apprentice",
                 thaiTitle: "ผู้ฝึกตนแห่งอาณาจักรไพทอน",
@@ -311,6 +311,7 @@ class StorageManager {
             for (const qId in scores) {
                 total += Number(scores[qId] || 0);
             }
+            total = parseFloat(total.toFixed(2));
 
             const gradingObj = {
                 scores: scores,

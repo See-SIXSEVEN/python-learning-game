@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `(${student.grade} เลขที่ ${student.no} & เลขที่ ${student.partner.no})`
                 : `(${student.grade} เลขที่ ${student.no})`;
             document.getElementById('existing-sub').textContent = pairSub;
-            document.getElementById('existing-xp').textContent = `${progress.totalXP || 0} / 100 XP`;
+            document.getElementById('existing-xp').textContent = `${progress.totalXP || 0} / 2.0 คะแนน`;
 
             document.getElementById('btn-continue-quest').addEventListener('click', () => {
                 window.soundFX.playClick();
